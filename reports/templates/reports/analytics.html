@@ -2,52 +2,63 @@
 {% block title %}Reports & Analytics{% endblock %}
 {% block content %}
 <!-- Header Row -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 animate-fade-in">
     <div>
         <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Reports &amp; Analytics</h1>
-        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Comprehensive fleet analytics, cost breakdowns, ROI tracking, and data exports.</p>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Perform vehicle ROI analysis, cost breakdowns, and export log reports.</p>
     </div>
 </div>
 
 <!-- KPI Cards Grid - Row 1 -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
-        <div>
-            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Fleet Utilization</span>
-            <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">{{ fleet_utilization }}%</h2>
-            <p class="text-xs text-on-surface-variant mt-1">{{ active_vehicles }}/{{ total_vehicles }} active</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
-            <span class="material-symbols-outlined text-[28px]">insights</span>
-        </div>
-    </div>
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
-        <div>
-            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Fuel Efficiency</span>
-            <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ fuel_efficiency }} <span class="text-sm text-outline font-medium">km/L</span></h2>
-            <p class="text-xs text-on-surface-variant mt-1">{{ total_fuel_liters|floatformat:0 }} L total</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container">
-            <span class="material-symbols-outlined text-[28px]">local_gas_station</span>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.05s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Fleet Utilization</span>
+                <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">{{ fleet_utilization }}%</h2>
+                <p class="text-xs text-on-surface-variant mt-1">{{ active_vehicles }}/{{ total_vehicles }} active</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
+                <span class="material-symbols-outlined text-[28px]">insights</span>
+            </div>
         </div>
     </div>
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
-        <div>
-            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Operational Cost</span>
-            <h2 class="text-3xl font-bold text-error mt-1">₹{{ total_op_cost|floatformat:2 }}</h2>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error">
-            <span class="material-symbols-outlined text-[28px]">payments</span>
+
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.1s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Fuel Efficiency</span>
+                <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ fuel_efficiency }} <span class="text-sm text-outline font-medium">km/L</span></h2>
+                <p class="text-xs text-on-surface-variant mt-1">{{ total_fuel_liters|floatformat:0 }} L total</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 dark:bg-tertiary-container/20 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
+                <span class="material-symbols-outlined text-[28px]">local_gas_station</span>
+            </div>
         </div>
     </div>
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
-        <div>
-            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Completion Rate</span>
-            <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">{{ completion_rate }}%</h2>
-            <p class="text-xs text-on-surface-variant mt-1">{{ completed_trips }}/{{ total_trips }} trips</p>
+
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.15s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Operational Cost</span>
+                <h2 class="text-3xl font-bold text-error mt-1">₹{{ total_op_cost|floatformat:2 }}</h2>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-error/10 dark:bg-error/20 flex items-center justify-center text-error">
+                <span class="material-symbols-outlined text-[28px]">payments</span>
+            </div>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-            <span class="material-symbols-outlined text-[28px]">check_circle</span>
+    </div>
+
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.2s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Completion Rate</span>
+                <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">{{ completion_rate }}%</h2>
+                <p class="text-xs text-on-surface-variant mt-1">{{ completed_trips }}/{{ total_trips }} trips</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
+                <span class="material-symbols-outlined text-[28px]">check_circle</span>
+            </div>
         </div>
     </div>
 </div>
@@ -97,10 +108,10 @@
 <!-- Charts & Lists -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <!-- Cost Breakdown Doughnut -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in" style="animation-delay: 0.25s;">
         <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Cost Breakdown</h3>
         <div class="relative h-[240px] flex items-center justify-center">
-            <canvas id="costChart"></canvas>
+            <canvas id="costChart" aria-label="Cost breakdown chart" role="img"></canvas>
         </div>
     </div>
 
@@ -113,12 +124,13 @@
     </div>
 
     <!-- Vehicle ROI list -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex flex-col">
-        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Vehicle ROI</h3>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm flex flex-col animate-fade-in" style="animation-delay: 0.3s;">
+        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Vehicle Return on Investment (ROI)</h3>
+        
         <div class="overflow-y-auto max-h-[240px] flex-1">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left data-table" aria-label="Vehicle ROI">
                 <thead>
-                    <tr class="border-b border-outline-variant/20 bg-surface-container-low/10 dark:bg-outline-variant/5">
+                    <tr class="border-b border-outline-variant/15 dark:border-white/5 bg-surface-container-low/30 dark:bg-white/[0.02]">
                         <th class="py-2.5 px-3 font-semibold text-[10px] text-outline uppercase tracking-wider">Vehicle</th>
                         <th class="py-2.5 px-3 font-semibold text-[10px] text-outline uppercase tracking-wider">Acq. Cost</th>
                         <th class="py-2.5 px-3 font-semibold text-[10px] text-outline uppercase tracking-wider">Maint.</th>
@@ -126,18 +138,18 @@
                         <th class="py-2.5 px-3 font-semibold text-[10px] text-outline uppercase tracking-wider text-right">ROI</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-outline-variant/15 text-xs">
+                <tbody class="divide-y divide-outline-variant/10 dark:divide-white/5 text-xs">
                     {% for v in vehicle_rois %}
-                    <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10 transition-colors">
+                    <tr class="hover:bg-primary/[0.02] dark:hover:bg-white/[0.03] transition-colors">
                         <td class="py-2.5 px-3 font-bold text-on-surface dark:text-white">{{ v.vehicle }}</td>
                         <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.acquisition_cost|floatformat:0 }}</td>
                         <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.maintenance_cost|floatformat:0 }}</td>
                         <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.fuel_cost|floatformat:0 }}</td>
                         <td class="py-2.5 px-3 text-right">
                             {% if v.roi >= 0 %}
-                                <span class="px-2 py-0.5 font-bold rounded bg-on-tertiary-container text-tertiary-container">{{ v.roi }}%</span>
+                                <span class="px-2 py-0.5 font-bold rounded bg-tertiary-container/10 text-tertiary-container">{{ v.roi }}%</span>
                             {% else %}
-                                <span class="px-2 py-0.5 font-bold rounded bg-error-container text-on-error-container">{{ v.roi }}%</span>
+                                <span class="px-2 py-0.5 font-bold rounded bg-error-container/50 dark:bg-error/10 text-on-error-container">{{ v.roi }}%</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -159,22 +171,22 @@
 </div>
 
 <!-- Export Actions Panel -->
-<div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+<div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in" style="animation-delay: 0.35s;">
     <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Export Operational Reports</h3>
     <div class="flex flex-wrap gap-3">
-        <a href="{% url 'reports:export_csv' 'vehicles' %}" class="h-10 px-4 border border-outline-variant/50 hover:bg-primary/5 hover:border-primary text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+        <a href="{% url 'reports:export_csv' 'vehicles' %}" class="h-10 px-4 border border-outline-variant/50 dark:border-white/10 hover:bg-primary/5 hover:border-primary text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
             <span class="material-symbols-outlined text-[16px]">download</span> Export Vehicles
         </a>
-        <a href="{% url 'reports:export_csv' 'drivers' %}" class="h-10 px-4 border border-outline-variant/50 hover:bg-primary/5 hover:border-primary text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+        <a href="{% url 'reports:export_csv' 'drivers' %}" class="h-10 px-4 border border-outline-variant/50 dark:border-white/10 hover:bg-primary/5 hover:border-primary text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
             <span class="material-symbols-outlined text-[16px]">download</span> Export Drivers
         </a>
-        <a href="{% url 'reports:export_csv' 'trips' %}" class="h-10 px-4 border border-outline-variant/50 hover:bg-primary/5 hover:border-primary text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+        <a href="{% url 'reports:export_csv' 'trips' %}" class="h-10 px-4 border border-outline-variant/50 dark:border-white/10 hover:bg-primary/5 hover:border-primary text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
             <span class="material-symbols-outlined text-[16px]">download</span> Export Trips
         </a>
-        <a href="{% url 'reports:export_csv' 'fuel' %}" class="h-10 px-4 border border-outline-variant/50 hover:bg-primary/5 hover:border-primary text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+        <a href="{% url 'reports:export_csv' 'fuel' %}" class="h-10 px-4 border border-outline-variant/50 dark:border-white/10 hover:bg-primary/5 hover:border-primary text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
             <span class="material-symbols-outlined text-[16px]">download</span> Export Fuel Logs
         </a>
-        <a href="{% url 'reports:export_pdf' %}" class="h-10 px-4 border border-error/50 hover:bg-error/5 hover:border-error text-error dark:text-error-container rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+        <a href="{% url 'reports:export_pdf' %}" class="h-10 px-4 border border-error/30 dark:border-error/20 hover:bg-error/5 hover:border-error text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
             <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span> Export PDF Report
         </a>
     </div>
@@ -184,6 +196,8 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    const legendColor = isDark ? '#e0e3e5' : '#191c1e';
     const colorPrimary = '#4143d5';
     const colorError = '#ba1a1a';
     const colorSecondary = '#645efb';
@@ -197,18 +211,18 @@ document.addEventListener('DOMContentLoaded', () => {
             datasets: [{
                 data: [{{ fuel_cost }}, {{ maint_cost }}, {{ other_cost }}],
                 backgroundColor: [colorPrimary, colorError, colorSecondary],
-                borderWidth: 0, hoverOffset: 4
+                borderWidth: 0,
+                hoverOffset: 6
             }]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
             plugins: {
                 legend: {
-                    position: 'bottom', labels: {
-                        boxWidth: 12, padding: 15,
-                        color: document.documentElement.classList.contains('dark') ? '#eff1f3' : '#191c1e',
-                        font: { family: 'Inter', size: 12 }
-                    }
+                    position: 'bottom',
+                    labels: { boxWidth: 12, padding: 16, color: legendColor, font: { family: 'Inter', size: 12 } }
                 }
             }
         }
@@ -274,5 +288,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 {% endblock %}
-
-

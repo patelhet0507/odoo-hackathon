@@ -13,6 +13,9 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    
     <!-- Tailwind Configuration -->
     <script id="tailwind-config">
         tailwind.config = {
@@ -109,84 +112,113 @@
         }
     </script>
     <style>
-        body { background-color: #f7f9fb; }
+        /* === Base === */
+        body { background-color: #f7f9fb; transition: background-color 0.3s ease, color 0.3s ease; }
+
+        /* === Glass Panel === */
         .glass-panel {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
-        .slide-over-enter {
-            transform: translateX(100%);
+        .dark .glass-panel {
+            background: rgba(29, 30, 47, 0.9);
         }
-        .slide-over-enter-active {
-            transform: translateX(0);
-            transition: transform 300ms ease-in-out;
-        }
-        .slide-over-leave {
-            transform: translateX(0);
-        }
-        .slide-over-leave-active {
-            transform: translateX(100%);
-            transition: transform 300ms ease-in-out;
-        }
-        
-        .table-row-hover:hover {
-            background-color: #F8FAFC;
-            cursor: pointer;
-        }
-        
-        /* Radial Progress */
-        .radial-progress {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .radial-progress svg {
-            transform: rotate(-90deg);
-        }
-        .radial-progress circle {
-            fill: transparent;
-            stroke-width: 4;
-        }
-        .radial-progress .bg-circle {
-            stroke: #e0e3e5;
-        }
-        .radial-progress .progress-circle {
-            stroke: #4143d5;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.5s ease;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        /* Form Overrides */
-        input[type="text"], input[type="number"], input[type="email"], input[type="password"], input[type="date"], select, textarea {
-            width: 100%;
-            padding: 0.625rem 1rem;
+
+        /* === Slide-over === */
+        .slide-over-enter { transform: translateX(100%); }
+        .slide-over-enter-active { transform: translateX(0); transition: transform 300ms ease-in-out; }
+        .slide-over-leave { transform: translateX(0); }
+        .slide-over-leave-active { transform: translateX(100%); transition: transform 300ms ease-in-out; }
+
+        /* === Table === */
+        .table-row-hover:hover { background-color: #F8FAFC; cursor: pointer; }
+        .dark .table-row-hover:hover { background-color: rgba(198, 197, 215, 0.08); }
+
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .data-table thead th { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .data-table tbody tr:nth-child(even) { background-color: rgba(242, 244, 246, 0.5); }
+        .dark .data-table tbody tr:nth-child(even) { background-color: rgba(198, 197, 215, 0.04); }
+        .data-table tbody tr { transition: background-color 0.15s ease; }
+        .data-table tbody tr:hover { background-color: rgba(65, 67, 213, 0.04); }
+        .dark .data-table tbody tr:hover { background-color: rgba(198, 197, 215, 0.08); }
+
+        /* === Radial Progress === */
+        .radial-progress { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+        .radial-progress svg { transform: rotate(-90deg); }
+        .radial-progress circle { fill: transparent; stroke-width: 4; }
+        .radial-progress .bg-circle { stroke: #e0e3e5; }
+        .dark .radial-progress .bg-circle { stroke: rgba(198, 197, 215, 0.2); }
+        .radial-progress .progress-circle { stroke: #4143d5; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* === Scrollbar === */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(118, 117, 134, 0.25); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(118, 117, 134, 0.4); }
+        .dark ::-webkit-scrollbar-thumb { background: rgba(198, 197, 215, 0.15); }
+        .dark ::-webkit-scrollbar-thumb:hover { background: rgba(198, 197, 215, 0.25); }
+
+        /* === Form Fields === */
+        input[type="text"], input[type="number"], input[type="email"], input[type="password"], input[type="date"], textarea {
             background-color: #ffffff;
             border: 1px solid #c6c5d7;
             border-radius: 0.75rem;
             font-size: 0.875rem;
             color: #191c1e;
-            transition: all 0.2s;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
-        .dark input[type="text"], .dark input[type="number"], .dark input[type="email"], .dark input[type="password"], .dark input[type="date"], .dark select, .dark textarea {
+        .dark input[type="text"], .dark input[type="number"], .dark input[type="email"], .dark input[type="password"], .dark input[type="date"], .dark textarea {
             background-color: rgba(198, 197, 215, 0.08);
             border-color: rgba(198, 197, 215, 0.2);
             color: #ffffff;
         }
-        input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
+        input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="date"]:focus, textarea:focus {
             outline: none;
             border-color: #4143d5 !important;
-            box-shadow: 0 0 0 2px rgba(65, 67, 213, 0.15) !important;
-            --tw-ring-color: #4143d5 !important;
+            box-shadow: 0 0 0 3px rgba(65, 67, 213, 0.12) !important;
         }
+
+        /* === Select / Dropdown === */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23767586' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 12px;
+            border: 1px solid #c6c5d7;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            color: #191c1e;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+        .dark select {
+            background-color: rgba(29, 30, 47, 0.95);
+            border-color: rgba(198, 197, 215, 0.2);
+            color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239998ae' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+        }
+        select:focus {
+            outline: none;
+            border-color: #4143d5 !important;
+            box-shadow: 0 0 0 3px rgba(65, 67, 213, 0.12) !important;
+        }
+        select option {
+            background-color: #ffffff;
+            color: #191c1e;
+        }
+        .dark select option {
+            background-color: #1E1E2F;
+            color: #e0e3e5;
+        }
+
+        /* === Checkbox === */
         input[type="checkbox"] {
             border-radius: 0.25rem;
             border-color: #c6c5d7;
@@ -199,6 +231,57 @@
             border-color: rgba(198, 197, 215, 0.2);
             background-color: rgba(198, 197, 215, 0.08);
         }
+
+        /* === Animations === */
+        @keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slide-in-right { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes count-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .animate-fade-in { animation: fade-in 0.3s ease-out both; }
+        .animate-slide-in { animation: slide-in-right 0.3s ease-out both; }
+        .animate-scale-in { animation: scale-in 0.2s ease-out both; }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(198,197,215,0.1) 25%, rgba(198,197,215,0.2) 50%, rgba(198,197,215,0.1) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 0.5rem;
+        }
+        .dark .skeleton {
+            background: linear-gradient(90deg, rgba(198,197,215,0.05) 25%, rgba(198,197,215,0.1) 50%, rgba(198,197,215,0.05) 75%);
+            background-size: 200% 100%;
+        }
+
+        /* === Cards Hover Elevation === */
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06); }
+        .dark .card-hover:hover { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); }
+
+        /* === Button Polish === */
+        .btn-primary {
+            background-color: #4143d5;
+            color: #ffffff;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(65, 67, 213, 0.25);
+        }
+        .btn-primary:hover { background-color: #645efb; box-shadow: 0 4px 14px rgba(65, 67, 213, 0.35); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); box-shadow: 0 1px 4px rgba(65, 67, 213, 0.2); }
+        .btn-primary:focus-visible { outline: 2px solid #4143d5; outline-offset: 2px; }
+
+        /* === Focus Visible (Accessibility) === */
+        *:focus-visible {
+            outline: 2px solid #4143d5;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        /* === Print === */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+        }
     </style>
     <script>
         // Init theme early to prevent flicker
@@ -209,11 +292,11 @@
         }
     </script>
 </head>
-<body class="bg-background dark:bg-on-background text-on-surface dark:text-inverse-on-surface font-body-md antialiased overflow-hidden flex h-screen">
+<body class="bg-background dark:bg-[#121218] text-on-surface dark:text-inverse-on-surface font-body-md antialiased overflow-hidden flex h-screen">
 
 {% if user.is_authenticated %}
 <!-- SideNavBar -->
-<nav id="sidebar" class="fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-surface-container-lowest dark:bg-on-background h-screen w-64 border-r border-outline-variant/30 shadow-sm transition-all duration-300 ease-in-out hidden md:flex">
+<nav id="sidebar" class="fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-surface-container-lowest dark:bg-[#1E1E2F] h-screen w-64 border-r border-outline-variant/30 shadow-sm transition-all duration-300 ease-in-out hidden md:flex" aria-label="Main navigation">
     <!-- Header -->
     <div class="p-6 flex items-center gap-sm">
         <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0 overflow-hidden">
@@ -227,69 +310,69 @@
     
     <!-- Navigation Tabs -->
     {% with request.resolver_match.view_name as view_name %}
-    <div class="flex-1 overflow-y-auto px-4 py-2 space-y-1">
+    <div class="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
         <!-- Dashboard -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'dashboard' in request.path or view_name == 'dashboard:home' %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'dashboard:home' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'dashboard' in request.path or view_name == 'dashboard:home' %}1{% else %}0{% endif %};">dashboard</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'dashboard' in request.path or view_name == 'dashboard:home' %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'dashboard:home' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'dashboard' in request.path or view_name == 'dashboard:home' %}1{% else %}0{% endif %};">dashboard</span>
             <span>Dashboard</span>
         </a>
         
         <!-- Vehicles -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'vehicle' in request.path %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'fleet:vehicle_list' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'vehicle' in request.path %}1{% else %}0{% endif %};">directions_car</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'vehicle' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:vehicle_list' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'vehicle' in request.path %}1{% else %}0{% endif %};">directions_car</span>
             <span>Vehicles</span>
         </a>
         
         <!-- Drivers -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'driver' in request.path %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'fleet:driver_list' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'driver' in request.path %}1{% else %}0{% endif %};">person</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'driver' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:driver_list' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'driver' in request.path %}1{% else %}0{% endif %};">person</span>
             <span>Drivers</span>
         </a>
         
         <!-- Trips -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'trip' in request.path and not 'complete' in request.path %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'fleet:trip_list' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'trip' in request.path and not 'complete' in request.path %}1{% else %}0{% endif %};">route</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'trip' in request.path and not 'complete' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:trip_list' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'trip' in request.path and not 'complete' in request.path %}1{% else %}0{% endif %};">route</span>
             <span>Trips</span>
         </a>
         
         <!-- Dispatch -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'trip/create' in request.path %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'fleet:trip_create' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'trip/create' in request.path %}1{% else %}0{% endif %};">local_shipping</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'trip/create' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:trip_create' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'trip/create' in request.path %}1{% else %}0{% endif %};">local_shipping</span>
             <span>Dispatch</span>
         </a>
         
         <!-- Maintenance -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'maintenance' in request.path %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'fleet:maintenance_list' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'maintenance' in request.path %}1{% else %}0{% endif %};">build</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'maintenance' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:maintenance_list' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'maintenance' in request.path %}1{% else %}0{% endif %};">build</span>
             <span>Maintenance</span>
         </a>
         
         <!-- Fuel -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'fuel' in request.path %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'fleet:fuel_list' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'fuel' in request.path %}1{% else %}0{% endif %};">local_gas_station</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'fuel' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:fuel_list' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'fuel' in request.path %}1{% else %}0{% endif %};">local_gas_station</span>
             <span>Fuel Logs</span>
         </a>
         
         <!-- Expenses -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'expense' in request.path %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'fleet:expense_list' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'expense' in request.path %}1{% else %}0{% endif %};">payments</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'expense' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:expense_list' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'expense' in request.path %}1{% else %}0{% endif %};">payments</span>
             <span>Expenses</span>
         </a>
         
-        <div class="h-px w-full bg-outline-variant/30 my-4"></div>
+        <div class="h-px w-full bg-outline-variant/20 my-3"></div>
         
         <!-- Reports / Analytics -->
-        <a class="flex items-center gap-sm px-4 py-3 rounded-lg {% if 'reports' in request.path %}bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:text-surface-variant dark:hover:text-on-surface{% endif %} transition-colors font-body-md text-body-md font-medium" href="{% url 'reports:analytics' %}">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if 'reports' in request.path %}1{% else %}0{% endif %};">analytics</span>
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'reports' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'reports:analytics' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'reports' in request.path %}1{% else %}0{% endif %};">analytics</span>
             <span>Analytics</span>
         </a>
     </div>
     {% endwith %}
     
     <!-- CTA -->
-    <div class="p-4 mt-auto">
-        <a href="{% url 'fleet:trip_create' %}" class="w-full bg-primary text-on-primary py-3 rounded-lg font-body-md font-medium flex items-center justify-center gap-2 hover:bg-secondary-container transition-colors shadow-[0_4px_14px_0_rgba(91,95,239,0.39)]">
-            <span class="material-symbols-outlined text-sm">rocket_launch</span>
+    <div class="p-3 mt-auto">
+        <a href="{% url 'fleet:trip_create' %}" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2 btn-primary" aria-label="Quick Dispatch">
+            <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
             Quick Dispatch
         </a>
     </div>
@@ -297,10 +380,10 @@
 {% endif %}
 
 <!-- Main Content Canvas -->
-<main class="flex-1 flex flex-col {% if user.is_authenticated %}ml-0 md:ml-64 w-full md:max-w-[calc(100vw-256px)]{% else %}w-full{% endif %} h-screen overflow-hidden relative bg-background dark:bg-on-background">
+<main class="flex-1 flex flex-col {% if user.is_authenticated %}ml-0 md:ml-64 w-full md:max-w-[calc(100vw-256px)]{% else %}w-full{% endif %} h-screen overflow-hidden relative bg-background dark:bg-[#121218]">
     {% if user.is_authenticated %}
     <!-- TopNavBar -->
-    <header class="h-16 w-full bg-surface-container-lowest/80 dark:bg-on-background/80 backdrop-blur-md flex justify-between items-center px-6 border-b border-outline-variant/20 shadow-sm transition-all duration-200 z-30">
+    <header class="h-16 w-full bg-white/80 dark:bg-[#1E1E2F]/80 backdrop-blur-md flex justify-between items-center px-6 border-b border-outline-variant/20 shadow-sm transition-all duration-200 z-30">
         <div class="flex items-center gap-md">
             <!-- Mobile Menu Toggle -->
             <button onclick="toggleMobileSidebar()" class="md:hidden p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-outline-variant/20 rounded-full">
@@ -311,35 +394,39 @@
         
         <div class="flex items-center gap-sm">
             <!-- Search Input -->
-            <form method="get" action="{% url 'fleet:vehicle_list' %}" class="relative hidden sm:block w-64">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
-                <input name="q" class="w-full pl-10 pr-4 py-2 bg-surface-container-low dark:bg-outline-variant/10 dark:text-white border-none rounded-full focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm placeholder-outline transition-shadow" placeholder="Search vehicles, drivers..." type="text"/>
+            <form method="get" action="{% url 'fleet:vehicle_list' %}" class="relative hidden sm:block w-64" role="search">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">search</span>
+                <input name="q" class="w-full pl-10 pr-4 py-2 bg-surface-container-low dark:bg-white/5 dark:text-white border border-transparent dark:border-white/10 rounded-full focus:ring-2 focus:ring-primary/20 focus:border-primary/30 focus:outline-none text-sm placeholder-outline transition-all" placeholder="Search vehicles, drivers..." type="text" aria-label="Search vehicles, drivers"/>
             </form>
             
             <div class="h-6 w-px bg-outline-variant/30 mx-2 hidden sm:block"></div>
             
             <!-- Dark Mode Toggle -->
-            <button id="themeToggle" class="p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-outline-variant/20 rounded-full transition-colors">
-                <span class="material-symbols-outlined" id="themeIcon">dark_mode</span>
+            <button id="themeToggle" class="p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-white/10 rounded-full transition-colors" aria-label="Toggle dark mode">
+                <span class="material-symbols-outlined text-[20px]" id="themeIcon">dark_mode</span>
             </button>
             
             <!-- Profile Dropdown -->
             <div class="relative">
-                <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 focus:outline-none">
+                <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full" aria-haspopup="true" aria-expanded="false" id="profileBtn">
                     <div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/50 cursor-pointer hover:ring-2 ring-primary/30 transition-all flex items-center justify-center bg-primary-container text-white text-xs font-bold">
                         {{ user.username|slice:":2"|upper }}
                     </div>
                 </button>
-                <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-surface-container-lowest dark:bg-on-background border border-outline-variant/30 rounded-lg shadow-xl py-1 z-50">
-                    <div class="px-4 py-2 border-b border-outline-variant/20">
-                        <p class="text-xs text-outline">Signed in as</p>
-                        <p class="text-sm font-semibold truncate">{{ user.get_full_name|default:user.username }}</p>
-                        <span class="inline-block mt-1 px-2 py-0.5 text-[10px] bg-primary/10 text-primary dark:text-primary-fixed dark:bg-primary/25 rounded-full font-medium">
+                <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-52 bg-white dark:bg-[#1E1E2F] border border-outline-variant/30 rounded-xl shadow-xl py-1 z-50 animate-scale-in">
+                    <div class="px-4 py-3 border-b border-outline-variant/20">
+                        <p class="text-[10px] text-outline font-medium tracking-wider uppercase">Signed in as</p>
+                        <p class="text-sm font-semibold text-on-surface dark:text-white truncate mt-0.5">{{ user.get_full_name|default:user.username }}</p>
+                        <span class="inline-block mt-1.5 px-2 py-0.5 text-[10px] bg-primary/10 text-primary dark:text-primary-fixed-dim dark:bg-primary/25 rounded-full font-semibold">
                             {{ user.get_role_display }}
                         </span>
                     </div>
-                    <a href="{% url 'admin:index' %}" class="block px-4 py-2 text-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-outline-variant/20">Django Admin</a>
-                    <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-error hover:bg-error-container/20 border-t border-outline-variant/25">Logout</a>
+                    <a href="{% url 'admin:index' %}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-white/5 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Django Admin
+                    </a>
+                    <a href="{% url 'logout' %}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-error hover:bg-error-container/20 border-t border-outline-variant/20 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">logout</span> Logout
+                    </a>
                 </div>
             </div>
         </div>
@@ -348,12 +435,12 @@
 
     <!-- Django Flash Messages -->
     {% if messages %}
-    <div class="absolute top-18 right-6 z-50 flex flex-col gap-2 max-w-sm">
+    <div class="absolute top-18 right-6 z-50 flex flex-col gap-2 max-w-sm" aria-live="polite">
         {% for message in messages %}
-        <div class="p-4 rounded-xl border flex items-center justify-between gap-4 shadow-lg transition-all duration-300 {% if message.tags == 'success' %}bg-on-tertiary-container border-tertiary-container/30 text-tertiary-container{% elif message.tags == 'error' %}bg-error-container border-error-container/30 text-on-error-container{% else %}bg-surface-container-high border-outline-variant/30 text-on-surface-variant{% endif %}" role="alert">
+        <div class="p-4 rounded-xl border flex items-center justify-between gap-4 shadow-lg animate-slide-in {% if message.tags == 'success' %}bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800/40 text-green-800 dark:text-green-200{% elif message.tags == 'error' %}bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/40 text-red-800 dark:text-red-200{% else %}bg-surface-container-high dark:bg-outline-variant/10 border-outline-variant/30 text-on-surface-variant{% endif %}" role="alert">
             <span class="text-sm font-medium">{{ message }}</span>
-            <button onclick="this.parentElement.remove()" class="text-outline hover:text-on-surface">
-                <span class="material-symbols-outlined text-sm">close</span>
+            <button onclick="this.parentElement.remove()" class="text-outline hover:text-on-surface p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" aria-label="Dismiss">
+                <span class="material-symbols-outlined text-[16px]">close</span>
             </button>
         </div>
         {% endfor %}
@@ -367,7 +454,7 @@
 </main>
 
 <!-- Mobile Navigation Drawer Overlay -->
-<div id="mobileDrawerOverlay" class="fixed inset-0 z-40 bg-on-background/40 backdrop-blur-sm hidden" onclick="toggleMobileSidebar()"></div>
+<div id="mobileDrawerOverlay" class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm hidden transition-opacity duration-300" onclick="toggleMobileSidebar()"></div>
 
 <script>
     // Toggle Mobile Sidebar

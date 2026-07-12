@@ -1,28 +1,96 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>TransitOps Report</title>
+<head><meta charset="UTF-8"><title>TransitOps Fleet Report</title>
 <style>
-body { font-family: Helvetica, sans-serif; font-size: 12px; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-th { background: #0d6efd; color: white; }
-h1 { color: #0d6efd; }
-.kpi { font-size: 16px; margin: 5px 0; }
+@page { size: A4; margin: 18mm 15mm; }
+body { font-family: Helvetica, Arial, sans-serif; font-size: 9.5pt; color: #1a1a1a; line-height: 1.5; }
+h1 { font-size: 22pt; color: #4143d5; margin: 0 0 2px; }
+h2 { font-size: 12pt; color: #4143d5; border-bottom: 2px solid #4143d5; padding-bottom: 4px; margin: 20px 0 10px; }
+h3 { font-size: 10pt; color: #555; margin: 14px 0 6px; }
+.subtitle { color: #888; font-size: 8pt; text-transform: uppercase; letter-spacing: 1pt; margin: 0 0 18px; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 8pt; }
+th { background: #4143d5; color: white; padding: 6px 6px; text-align: left; font-weight: 600; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.3pt; }
+td { padding: 5px 6px; border-bottom: 1px solid #ddd; }
+tr:nth-child(even) td { background: #f7f9fb; }
+.kpi-row { display: flex; gap: 12px; margin: 12px 0; }
+.kpi-box { flex: 1; border: 1px solid #ddd; border-radius: 6px; padding: 10px; text-align: center; }
+.kpi-box .label { font-size: 7pt; color: #888; text-transform: uppercase; letter-spacing: 0.5pt; }
+.kpi-box .value { font-size: 16pt; font-weight: bold; color: #4143d5; margin-top: 2px; }
+.footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 7pt; color: #999; text-align: center; }
+.page-break { page-break-before: always; }
 </style>
 </head>
 <body>
 <h1>TransitOps Fleet Report</h1>
-<p>Generated: {{ generated_at }}</p>
-<div class="kpi"><strong>Completed Trips:</strong> {{ completed_trips }}</div>
-<div class="kpi"><strong>Total Operational Cost:</strong> ₹{{ total_op_cost }}</div>
+<div class="subtitle">Enterprise Fleet Operations — Operational Report</div>
+<p style="font-size:8pt;color:#888;margin:0 0 16px;">Generated: {{ generated_at|date:"F d, Y H:i" }}</p>
+
+<div class="kpi-row">
+  <div class="kpi-box"><div class="label">Total Vehicles</div><div class="value">{{ total_vehicles }}</div></div>
+  <div class="kpi-box"><div class="label">Total Drivers</div><div class="value">{{ total_drivers }}</div></div>
+  <div class="kpi-box"><div class="label">Completed Trips</div><div class="value">{{ completed_trips }}</div></div>
+  <div class="kpi-box"><div class="label">Active Trips</div><div class="value">{{ active_trips }}</div></div>
+  <div class="kpi-box"><div class="label">Operational Cost</div><div class="value">₹{{ total_op_cost|floatformat:0 }}</div></div>
+</div>
+
 <h2>Vehicle Registry</h2>
 <table>
-<tr><th>Reg #</th><th>Name</th><th>Type</th><th>Odometer (km)</th><th>Status</th></tr>
+<tr><th>Reg #</th><th>Name</th><th>Type</th><th>Odometer</th><th>Max Load</th><th>Region</th><th>Status</th></tr>
 {% for v in vehicles %}
-<tr><td>{{ v.registration_number }}</td><td>{{ v.name }}</td><td>{{ v.vehicle_type }}</td><td>{{ v.odometer }}</td><td>{{ v.status }}</td></tr>
+<tr><td>{{ v.registration_number }}</td><td>{{ v.name }}</td><td>{{ v.vehicle_type }}</td><td>{{ v.odometer }} km</td><td>{{ v.max_load_capacity }} kg</td><td>{{ v.region|default:'—' }}</td><td>{{ v.status }}</td></tr>
 {% endfor %}
 </table>
+
+<div class="page-break"></div>
+
+<h2>Driver Directory</h2>
+<table>
+<tr><th>Name</th><th>License #</th><th>Category</th><th>Expiry</th><th>Safety Score</th><th>Status</th></tr>
+{% for d in drivers %}
+<tr><td>{{ d.name }}</td><td>{{ d.license_number }}</td><td>{{ d.license_category }}</td><td>{{ d.license_expiry_date|date:"Y-m-d" }}</td><td>{{ d.safety_score }}</td><td>{{ d.status }}</td></tr>
+{% endfor %}
+</table>
+
+<h2>Trip Log</h2>
+<table>
+<tr><th>ID</th><th>Vehicle</th><th>Driver</th><th>Route</th><th>Cargo</th><th>Distance</th><th>Status</th></tr>
+{% for t in trips %}
+<tr><td>TRP-{{ t.id }}</td><td>{{ t.vehicle.registration_number }}</td><td>{{ t.driver.name }}</td><td>{{ t.source }} → {{ t.destination }}</td><td>{{ t.cargo_weight }} kg</td><td>{{ t.planned_distance }} km</td><td>{{ t.status }}</td></tr>
+{% endfor %}
+</table>
+
+<div class="page-break"></div>
+
+<h2>Fuel Logs</h2>
+{% if fuel_logs %}
+<table>
+<tr><th>Vehicle</th><th>Liters</th><th>Cost</th><th>Date</th></tr>
+{% for f in fuel_logs %}
+<tr><td>{{ f.vehicle.registration_number }}</td><td>{{ f.liters }} L</td><td>${{ f.cost|floatformat:2 }}</td><td>{{ f.date|date:"Y-m-d" }}</td></tr>
+{% endfor %}
+</table>
+{% else %}<p style="color:#888;">No fuel logs recorded.</p>{% endif %}
+
+<h2>Maintenance Records</h2>
+{% if maintenance %}
+<table>
+<tr><th>Vehicle</th><th>Description</th><th>Type</th><th>Scheduled</th><th>Cost</th><th>Status</th></tr>
+{% for m in maintenance %}
+<tr><td>{{ m.vehicle.registration_number }}</td><td>{{ m.description|truncatechars:40 }}</td><td>{{ m.maintenance_type|default:'General' }}</td><td>{{ m.scheduled_date|date:"Y-m-d" }}</td><td>${{ m.cost|floatformat:2 }}</td><td>{{ m.status }}</td></tr>
+{% endfor %}
+</table>
+{% else %}<p style="color:#888;">No maintenance records.</p>{% endif %}
+
+<h2>Expenses</h2>
+{% if expenses %}
+<table>
+<tr><th>Vehicle</th><th>Type</th><th>Amount</th><th>Date</th><th>Description</th></tr>
+{% for e in expenses %}
+<tr><td>{{ e.vehicle.registration_number }}</td><td>{{ e.expense_type }}</td><td>${{ e.amount|floatformat:2 }}</td><td>{{ e.date|date:"Y-m-d" }}</td><td>{{ e.description|truncatechars:35 }}</td></tr>
+{% endfor %}
+</table>
+{% else %}<p style="color:#888;">No expenses recorded.</p>{% endif %}
+
+<div class="footer">TransitOps — Enterprise Fleet Management System — Confidential</div>
 </body>
 </html>
-
-

@@ -1,24 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Expenses Directory{% endblock %}
 {% block content %}
-<!-- Header & Actions -->
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4 animate-fade-in">
     <div>
-        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Expenses Log</h1>
+        <h1 class="text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Expenses Log</h1>
         <p class="text-sm text-on-surface-variant dark:text-surface-variant">Track toll fees, maintenance billing, parking costs, fuel billing, and other administrative payments.</p>
     </div>
-    
-    <a href="{% url 'fleet:expense_create' %}" class="h-10 px-4 bg-primary text-on-primary rounded-xl font-medium text-xs flex items-center gap-2 hover:bg-secondary-container transition-colors shadow-sm whitespace-nowrap shrink-0">
+    <a href="{% url 'fleet:expense_create' %}" class="h-10 px-4 bg-primary text-white rounded-xl font-medium text-sm flex items-center gap-2 btn-primary whitespace-nowrap shrink-0">
         <span class="material-symbols-outlined text-[16px]">payments</span>
         Record Expense
     </a>
 </div>
 
-<!-- Search & Filters -->
-<form method="get" class="flex flex-wrap gap-3 mb-4">
+<form method="get" class="flex flex-wrap gap-3 mb-4 animate-fade-in" style="animation-delay: 0.05s;">
     <div class="relative w-full sm:w-auto">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
-        <input type="text" name="q" placeholder="Search registration, type, description..." value="{{ query }}" class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm placeholder-outline transition-all" style="min-width: 240px;"/>
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">search</span>
+        <input type="text" name="q" placeholder="Search registration, type, description..." value="{{ query }}" class="w-full pl-10 pr-4 py-2 bg-surface-container-lowest dark:bg-[#1E1E2F] dark:text-white border border-outline-variant/30 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm placeholder-outline transition-all" style="min-width: 240px;" aria-label="Search expenses"/>
     </div>
     {% if query %}
         <a href="?" class="px-3 py-2 text-xs font-semibold text-error hover:underline flex items-center gap-1">
@@ -27,71 +24,55 @@
     {% endif %}
 </form>
 
-<!-- Expense Table Card -->
-<div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.01)] border border-outline-variant/30 overflow-hidden relative">
-    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
-    
+<div class="bg-white dark:bg-[#1E1E2F] rounded-2xl shadow-sm border border-outline-variant/20 dark:border-white/5 overflow-hidden relative animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-secondary to-tertiary-fixed-dim opacity-60"></div>
     <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full text-left data-table" aria-label="Expenses">
             <thead>
-                <tr class="border-b border-outline-variant/20 bg-surface-container-low/30 dark:bg-outline-variant/5">
-                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Vehicle</th>
-                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Expense Type</th>
-                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Amount</th>
-                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Date Logged</th>
-                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Description</th>
+                <tr class="border-b border-outline-variant/20 dark:border-white/5 bg-surface-container-low/50 dark:bg-white/[0.02]">
+                    <th class="py-3.5 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Vehicle</th>
+                    <th class="py-3.5 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Expense Type</th>
+                    <th class="py-3.5 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Amount</th>
+                    <th class="py-3.5 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Date Logged</th>
+                    <th class="py-3.5 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Description</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-outline-variant/15 text-sm">
+            <tbody class="divide-y divide-outline-variant/10 dark:divide-white/5 text-sm">
                 {% for e in expenses %}
-                <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10 transition-colors">
-                    <!-- Vehicle -->
-                    <td class="py-4 px-6 font-semibold text-on-surface dark:text-white">
+                <tr class="hover:bg-primary/[0.02] dark:hover:bg-white/[0.03] transition-colors">
+                    <td class="py-3.5 px-6 font-semibold text-on-surface dark:text-white">
                         {{ e.vehicle.registration_number }}
                         <div class="text-[10px] text-outline font-medium mt-0.5">{{ e.vehicle.name }}</div>
                     </td>
-                    
-                    <!-- Type -->
-                    <td class="py-4 px-6">
+                    <td class="py-3.5 px-6">
                         {% if e.expense_type == 'Fuel' %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary text-xs font-semibold">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-semibold">
                                 <span class="material-symbols-outlined text-[12px]">local_gas_station</span> Fuel
                             </span>
                         {% elif e.expense_type == 'Maintenance' %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-semibold">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-error-container/50 dark:bg-error/10 text-on-error-container text-xs font-semibold">
                                 <span class="material-symbols-outlined text-[12px]">build</span> Maintenance
                             </span>
                         {% elif e.expense_type == 'Toll' %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-fixed-dim text-xs font-semibold">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary dark:text-primary-fixed-dim text-xs font-semibold">
                                 <span class="material-symbols-outlined text-[12px]">toll</span> Toll
                             </span>
                         {% else %}
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-outline-variant/30 text-outline text-xs font-semibold">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-outline-variant/20 dark:bg-white/5 text-outline text-xs font-semibold">
                                 <span class="material-symbols-outlined text-[12px]">payments</span> {{ e.expense_type }}
                             </span>
                         {% endif %}
                     </td>
 
-                    <!-- Amount -->
-                    <td class="py-4 px-6 font-bold text-error">
-                        ₹{{ e.amount|floatformat:2 }}
-                    </td>
-
-                    <!-- Date -->
-                    <td class="py-4 px-6 font-medium text-on-surface dark:text-white">
-                        {{ e.date|date:"M d, Y" }}
-                    </td>
-
-                    <!-- Description -->
-                    <td class="py-4 px-6 text-on-surface-variant dark:text-surface-variant max-w-xs truncate" title="{{ e.description }}">
-                        {{ e.description|default:'-' }}
-                    </td>
+                    <td class="py-3.5 px-6 font-bold text-error">₹{{ e.amount|floatformat:2 }}</td>
+                    <td class="py-3.5 px-6 font-medium text-on-surface dark:text-white">{{ e.date|date:"M d, Y" }}</td>
+                    <td class="py-3.5 px-6 text-on-surface-variant dark:text-surface-variant max-w-xs truncate" title="{{ e.description }}">{{ e.description|default:'-' }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="py-8 text-center text-outline">
-                        <span class="material-symbols-outlined text-[36px] opacity-40">receipt_long</span>
-                        <p class="mt-2 text-sm">No expenses recorded.</p>
+                    <td colspan="5" class="py-12 text-center">
+                        <span class="material-symbols-outlined text-[40px] text-outline/30 block mb-2">receipt_long</span>
+                        <p class="text-sm text-outline font-medium">No expenses recorded.</p>
                     </td>
                 </tr>
                 {% endfor %}
@@ -100,5 +81,3 @@
     </div>
 </div>
 {% endblock %}
-
-

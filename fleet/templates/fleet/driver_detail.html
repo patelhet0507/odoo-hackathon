@@ -2,57 +2,55 @@
 {% block title %}{{ driver.name }} - Details{% endblock %}
 {% block content %}
 <!-- Header -->
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 animate-fade-in">
     <div>
         <a href="{% url 'fleet:driver_list' %}" class="inline-flex items-center gap-1 text-xs font-semibold text-primary dark:text-primary-fixed-dim hover:underline mb-2">
             <span class="material-symbols-outlined text-[14px]">arrow_back</span> Back to Directory
         </a>
-        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold leading-tight">{{ driver.name }}</h1>
+        <h1 class="text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold leading-tight">{{ driver.name }}</h1>
         <p class="text-sm text-on-surface-variant dark:text-surface-variant">Driver ID: DBID-{{ driver.id }} • CDL Verified</p>
     </div>
     
     <div class="flex gap-2">
-        <a href="{% url 'fleet:driver_update' driver.pk %}" class="h-10 px-4 border border-outline-variant/50 text-on-surface dark:text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-low transition-colors shadow-sm">
-            <span class="material-symbols-outlined text-[16px]">edit</span>
-            Edit Profile
+        <a href="{% url 'fleet:driver_update' driver.pk %}" class="h-10 px-4 border border-outline-variant/50 dark:border-white/10 text-on-surface dark:text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-low dark:hover:bg-white/5 transition-colors">
+            <span class="material-symbols-outlined text-[16px]">edit</span> Edit Profile
         </a>
-        <a href="{% url 'fleet:driver_delete' driver.pk %}" class="h-10 px-4 border border-error/30 text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-error-container/20 transition-colors shadow-sm">
-            <span class="material-symbols-outlined text-[16px]">delete</span>
-            Delete
+        <a href="{% url 'fleet:driver_delete' driver.pk %}" class="h-10 px-4 border border-error/30 text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-error/5 transition-colors">
+            <span class="material-symbols-outlined text-[16px]">delete</span> Delete
         </a>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in" style="animation-delay: 0.1s;">
     <!-- Driver Info Card -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl border border-outline-variant/30 overflow-hidden relative shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
-        <div class="p-5 border-b border-outline-variant/20 bg-surface-container-low/20 dark:bg-outline-variant/5">
+    <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 overflow-hidden relative shadow-sm">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary opacity-60"></div>
+        <div class="p-5 border-b border-outline-variant/15 dark:border-white/5 bg-surface-container-low/30 dark:bg-white/[0.02]">
             <h3 class="text-sm font-bold text-on-surface dark:text-white uppercase tracking-wider">Driver Credentials</h3>
         </div>
         <div class="p-5 space-y-4 text-sm">
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">License Number</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ driver.license_number }}</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">License Category</span>
                 <span class="font-semibold text-on-surface dark:text-white">Category {{ driver.license_category }}</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Expiration Date</span>
                 <span class="font-semibold {% if driver.license_is_expired %}text-error{% else %}text-on-surface dark:text-white{% endif %}">
                     {{ driver.license_expiry_date|date:"M d, Y" }}
                     {% if driver.license_is_expired %}
-                        <span class="ml-1 px-1.5 py-0.5 text-[9px] font-bold rounded bg-error-container text-on-error-container">Expired</span>
+                        <span class="ml-1 px-1.5 py-0.5 text-[9px] font-bold rounded bg-error-container/50 dark:bg-error/10 text-on-error-container">Expired</span>
                     {% endif %}
                 </span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Contact Number</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ driver.contact_number }}</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Safety Score</span>
                 <div class="flex items-center gap-1.5 font-bold {% if driver.safety_score >= 90 %}text-tertiary-container dark:text-tertiary-fixed-dim{% elif driver.safety_score >= 75 %}text-primary{% else %}text-error{% endif %}">
                     <span>{{ driver.safety_score }}/100</span>
@@ -61,52 +59,50 @@
             <div class="flex justify-between items-center py-2">
                 <span class="text-outline font-medium">Duty Status</span>
                 {% if driver.status == 'Available' %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-outline-variant/30 text-outline text-xs font-semibold">Available</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-outline-variant/20 dark:bg-white/5 text-outline text-xs font-semibold">Available</span>
                 {% elif driver.status == 'On Trip' %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-on-tertiary-container text-tertiary-container text-xs font-semibold">On Trip</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-tertiary-container/10 text-tertiary-container text-xs font-semibold">On Trip</span>
                 {% elif driver.status == 'Off Duty' %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-semibold">Off Duty</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high dark:bg-white/5 text-on-surface-variant text-xs font-semibold">Off Duty</span>
                 {% else %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-semibold">Suspended</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-error-container/50 dark:bg-error/10 text-on-error-container text-xs font-semibold">Suspended</span>
                 {% endif %}
             </div>
         </div>
     </div>
 
     <!-- Trip History -->
-    <div class="col-span-1 lg:col-span-2 bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl border border-outline-variant/30 overflow-hidden relative shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
-        <div class="p-5 border-b border-outline-variant/20 bg-surface-container-low/20 dark:bg-outline-variant/5">
+    <div class="col-span-1 lg:col-span-2 bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 overflow-hidden relative shadow-sm">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary opacity-60"></div>
+        <div class="p-5 border-b border-outline-variant/15 dark:border-white/5 bg-surface-container-low/30 dark:bg-white/[0.02]">
             <h3 class="text-sm font-bold text-on-surface dark:text-white uppercase tracking-wider">Trip History</h3>
         </div>
         <div class="p-5 space-y-3">
             {% for t in trips %}
-                <div class="p-4 bg-surface-container-low dark:bg-outline-variant/10 border border-outline-variant/20 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm">
+                <div class="p-4 bg-surface-container-low/50 dark:bg-white/[0.03] border border-outline-variant/15 dark:border-white/5 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm transition-colors hover:bg-surface-container-low dark:hover:bg-white/[0.05]">
                     <div class="flex flex-col">
                         <div class="flex items-center gap-1 font-semibold text-on-surface dark:text-white">
                             <span>{{ t.source }}</span>
                             <span class="material-symbols-outlined text-[14px] text-outline mx-0.5">arrow_forward</span>
                             <span>{{ t.destination }}</span>
                         </div>
-                        <span class="text-[10px] text-outline mt-1">TRP-{{ t.id }} • Cargo: {{ t.cargo_weight|floatformat:0 }} kg • Vehicle: {{ t.vehicle.registration_number }} ({{ t.vehicle.name }})</span>
+                        <span class="text-[10px] text-outline mt-1">TRP-{{ t.id }} • Cargo: {{ t.cargo_weight|floatformat:0 }} kg • Vehicle: {{ t.vehicle.registration_number }}</span>
                     </div>
                     {% if t.status == 'Completed' %}
                         <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-primary/10 text-primary dark:text-primary-fixed-dim">Completed</span>
                     {% elif t.status == 'Dispatched' %}
-                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-on-tertiary-container text-tertiary-container">Dispatched</span>
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-tertiary-container/10 text-tertiary-container">Dispatched</span>
                     {% else %}
-                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-outline-variant/30 text-outline">{{ t.status }}</span>
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-outline-variant/20 dark:bg-white/5 text-outline">{{ t.status }}</span>
                     {% endif %}
                 </div>
             {% empty %}
                 <div class="py-12 text-center text-outline text-sm">
-                    <span class="material-symbols-outlined text-[36px] opacity-40">map</span>
-                    <p class="mt-2">No trips logged for this driver.</p>
+                    <span class="material-symbols-outlined text-[36px] opacity-40 block mb-2">map</span>
+                    <p>No trips logged for this driver.</p>
                 </div>
             {% endfor %}
         </div>
     </div>
 </div>
 {% endblock %}
-
-

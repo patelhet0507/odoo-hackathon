@@ -2,16 +2,16 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <!-- Header Row -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 animate-fade-in">
     <div>
-        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Dashboard</h1>
+        <h1 class="text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Dashboard</h1>
         <p class="text-sm text-on-surface-variant dark:text-surface-variant">Real-time telemetry and overview of your logistics assets.</p>
     </div>
     
     <!-- Filters form -->
-    <form method="get" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+    <form method="get" class="flex flex-wrap items-center gap-3 w-full md:w-auto" role="search" aria-label="Dashboard filters">
         <div class="relative w-full sm:w-auto min-w-[140px]">
-            <select name="type" onchange="this.form.submit()" class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all">
+            <select name="type" onchange="this.form.submit()" class="w-full pl-3 pr-9 py-2 bg-surface-container-lowest dark:bg-[#1E1E2F] dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all" aria-label="Vehicle type filter">
                 <option value="">All Types</option>
                 {% for t, label in vehicle_types %}
                     <option value="{{ t }}" {% if vehicle_type_filter == t %}selected{% endif %}>{{ label }}</option>
@@ -19,7 +19,7 @@
             </select>
         </div>
         <div class="relative w-full sm:w-auto min-w-[140px]">
-            <select name="status" onchange="this.form.submit()" class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all">
+            <select name="status" onchange="this.form.submit()" class="w-full pl-3 pr-9 py-2 bg-surface-container-lowest dark:bg-[#1E1E2F] dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all" aria-label="Vehicle status filter">
                 <option value="">All Statuses</option>
                 {% for s, label in vehicle_statuses %}
                     <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
@@ -27,10 +27,10 @@
             </select>
         </div>
         <div class="relative w-full sm:w-auto">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">map</span>
-            <input type="text" name="region" placeholder="Region" value="{{ region_filter }}" class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all" style="max-width: 140px;"/>
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">map</span>
+            <input type="text" name="region" placeholder="Region" value="{{ region_filter }}" class="w-full pl-10 pr-4 py-2 bg-surface-container-lowest dark:bg-[#1E1E2F] dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all" style="max-width: 140px;" aria-label="Region filter"/>
         </div>
-        <button type="submit" class="hidden sm:inline-flex px-4 py-2 bg-primary text-on-primary rounded-xl font-medium text-sm hover:bg-secondary-container transition-colors shadow-sm">
+        <button type="submit" class="h-10 px-4 bg-primary text-white rounded-xl font-medium text-sm btn-primary hidden sm:inline-flex items-center gap-2">
             Filter
         </button>
     </form>
@@ -39,50 +39,58 @@
 <!-- KPI Cards Grid -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <!-- Active Vehicles -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
-        <div>
-            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Active Vehicles</span>
-            <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">{{ active_vehicles }}</h2>
-            <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ available_vehicles }} available</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/25 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
-            <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.05s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Active Vehicles</span>
+                <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">{{ active_vehicles }}</h2>
+                <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ available_vehicles }} available</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
+                <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+            </div>
         </div>
     </div>
 
     <!-- In Maintenance -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
-        <div>
-            <span class="text-xs font-semibold text-outline tracking-wider uppercase">In Shop</span>
-            <h2 class="text-3xl font-bold text-error mt-1">{{ in_shop_vehicles }}</h2>
-            <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ open_maintenance }} open records</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error">
-            <span class="material-symbols-outlined text-[28px]">build</span>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.1s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">In Shop</span>
+                <h2 class="text-3xl font-bold text-error mt-1">{{ in_shop_vehicles }}</h2>
+                <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ open_maintenance }} open records</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-error/10 dark:bg-error/20 flex items-center justify-center text-error">
+                <span class="material-symbols-outlined text-[28px]">build</span>
+            </div>
         </div>
     </div>
 
     <!-- Active Trips -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
-        <div>
-            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Active Trips</span>
-            <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ active_trips }}</h2>
-            <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ pending_trips }} pending draft</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
-            <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">route</span>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.15s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Active Trips</span>
+                <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ active_trips }}</h2>
+                <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ pending_trips }} pending draft</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 dark:bg-tertiary-container/20 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
+                <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">route</span>
+            </div>
         </div>
     </div>
 
     <!-- Fleet Utilization -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
-        <div>
-            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Fleet Utilization</span>
-            <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">{{ fleet_utilization }}%</h2>
-            <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ total_vehicles }} total vehicles</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
-            <span class="material-symbols-outlined text-[28px]">analytics</span>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.2s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Fleet Utilization</span>
+                <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">{{ fleet_utilization }}%</h2>
+                <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ total_vehicles }} total vehicles</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
+                <span class="material-symbols-outlined text-[28px]">analytics</span>
+            </div>
         </div>
     </div>
 </div>
@@ -132,51 +140,51 @@
 <!-- Charts Grid -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <!-- Vehicle Status & Driver Status -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in" style="animation-delay: 0.25s;">
         <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Vehicle Status Distribution</h3>
         <div class="relative h-[240px] flex items-center justify-center">
-            <canvas id="vehicleChart"></canvas>
+            <canvas id="vehicleChart" aria-label="Vehicle status distribution chart" role="img"></canvas>
         </div>
     </div>
 
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in" style="animation-delay: 0.3s;">
         <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Driver Availability</h3>
         <div class="relative h-[240px] flex items-center justify-center">
-            <canvas id="driverChart"></canvas>
+            <canvas id="driverChart" aria-label="Driver availability chart" role="img"></canvas>
         </div>
     </div>
 
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in" style="animation-delay: 0.35s;">
         <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Trip Management Status</h3>
         <div class="relative h-[240px]">
-            <canvas id="tripChart"></canvas>
+            <canvas id="tripChart" aria-label="Trip management status chart" role="img"></canvas>
         </div>
     </div>
 
     <!-- Fleet Overview Statistics -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm flex flex-col justify-between animate-fade-in" style="animation-delay: 0.4s;">
         <div>
             <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Operational Summary</h3>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <tbody class="divide-y divide-outline-variant/20">
-                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                <table class="w-full text-left border-collapse data-table">
+                    <tbody class="divide-y divide-outline-variant/15">
+                        <tr class="hover:bg-surface-container-low/50 dark:hover:bg-white/5 transition-colors">
                             <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Total Vehicles</td>
                             <td class="py-3 px-2 text-sm font-semibold text-on-surface dark:text-white text-right">{{ total_vehicles }}</td>
                         </tr>
-                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                        <tr class="hover:bg-surface-container-low/50 dark:hover:bg-white/5 transition-colors">
                             <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Total Drivers</td>
                             <td class="py-3 px-2 text-sm font-semibold text-on-surface dark:text-white text-right">{{ total_drivers }}</td>
                         </tr>
-                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                        <tr class="hover:bg-surface-container-low/50 dark:hover:bg-white/5 transition-colors">
                             <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Completed Trips</td>
                             <td class="py-3 px-2 text-sm font-semibold text-tertiary-container dark:text-tertiary-fixed-dim text-right">{{ completed_trips }}</td>
                         </tr>
-                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                        <tr class="hover:bg-surface-container-low/50 dark:hover:bg-white/5 transition-colors">
                             <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Cancelled Trips</td>
                             <td class="py-3 px-2 text-sm font-semibold text-outline text-right">{{ cancelled_trips }}</td>
                         </tr>
-                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                        <tr class="hover:bg-surface-container-low/50 dark:hover:bg-white/5 transition-colors">
                             <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Expired Licenses</td>
                             <td class="py-3 px-2 text-right">
                                 <span class="px-2 py-0.5 rounded text-xs font-semibold bg-error-container text-on-error-container">
@@ -184,7 +192,7 @@
                                 </span>
                             </td>
                         </tr>
-                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                        <tr class="hover:bg-surface-container-low/50 dark:hover:bg-white/5 transition-colors">
                             <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Open Maintenance Logs</td>
                             <td class="py-3 px-2 text-right">
                                 <span class="px-2 py-0.5 rounded text-xs font-semibold bg-error/15 text-error">
@@ -260,14 +268,17 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Custom Colors matching tailwind design system
-    const colorPrimary = '#4143d5';       // Indigo (Active)
-    const colorTertiary = '#008259';      // Green (Available/Healthy)
-    const colorError = '#ba1a1a';         // Red (Shop/Maintenance)
-    const colorOutline = '#767586';       // Gray (Retired/Off duty)
-    const colorSecondary = '#645efb';     // Purple (Secondary highlight)
+    const isDark = document.documentElement.classList.contains('dark');
+    const textColor = isDark ? '#9998ae' : '#464555';
+    const gridColor = isDark ? 'rgba(153, 152, 174, 0.08)' : 'rgba(118, 117, 134, 0.1)';
+    const legendColor = isDark ? '#e0e3e5' : '#191c1e';
 
-    // Vehicle Chart
+    const colorPrimary = '#4143d5';
+    const colorTertiary = '#008259';
+    const colorError = '#ba1a1a';
+    const colorOutline = '#767586';
+    const colorSecondary = '#645efb';
+
     new Chart(document.getElementById('vehicleChart'), {
         type: 'doughnut',
         data: {
@@ -276,27 +287,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 data: [{{ active_vehicles }}, {{ available_vehicles }}, {{ in_shop_vehicles }}, {{ retired_vehicles }}],
                 backgroundColor: [colorPrimary, colorTertiary, colorError, colorOutline],
                 borderWidth: 0,
-                hoverOffset: 4
+                hoverOffset: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '65%',
             plugins: {
                 legend: {
                     position: 'bottom',
-                    labels: {
-                        boxWidth: 12,
-                        padding: 15,
-                        color: document.documentElement.classList.contains('dark') ? '#eff1f3' : '#191c1e',
-                        font: { family: 'Inter', size: 12 }
-                    }
+                    labels: { boxWidth: 12, padding: 16, color: legendColor, font: { family: 'Inter', size: 12 } }
                 }
             }
         }
     });
 
-    // Driver Chart
     new Chart(document.getElementById('driverChart'), {
         type: 'doughnut',
         data: {
@@ -305,27 +311,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 data: [{{ drivers_on_duty }}, {{ drivers_available }}, {{ drivers_off_duty }}, {{ drivers_suspended }}],
                 backgroundColor: [colorPrimary, colorTertiary, colorOutline, colorError],
                 borderWidth: 0,
-                hoverOffset: 4
+                hoverOffset: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '65%',
             plugins: {
                 legend: {
                     position: 'bottom',
-                    labels: {
-                        boxWidth: 12,
-                        padding: 15,
-                        color: document.documentElement.classList.contains('dark') ? '#eff1f3' : '#191c1e',
-                        font: { family: 'Inter', size: 12 }
-                    }
+                    labels: { boxWidth: 12, padding: 16, color: legendColor, font: { family: 'Inter', size: 12 } }
                 }
             }
         }
     });
 
-    // Trip Chart
     new Chart(document.getElementById('tripChart'), {
         type: 'bar',
         data: {
@@ -334,37 +335,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 label: 'Trips Count',
                 data: [{{ active_trips }}, {{ pending_trips }}, {{ completed_trips }}, {{ cancelled_trips }}],
                 backgroundColor: [colorPrimary, colorSecondary, colorTertiary, colorError],
-                borderRadius: 6,
-                borderWidth: 0
+                borderRadius: 8,
+                borderWidth: 0,
+                barThickness: 36
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
+            plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        color: document.documentElement.classList.contains('dark') ? '#767586' : '#464555',
-                        font: { family: 'Inter' }
-                    },
-                    grid: { color: 'rgba(118, 117, 134, 0.1)' }
-                },
-                x: {
-                    ticks: {
-                        color: document.documentElement.classList.contains('dark') ? '#767586' : '#464555',
-                        font: { family: 'Inter' }
-                    },
-                    grid: { display: false }
-                }
+                y: { beginAtZero: true, ticks: { color: textColor, font: { family: 'Inter' } }, grid: { color: gridColor } },
+                x: { ticks: { color: textColor, font: { family: 'Inter' } }, grid: { display: false } }
             }
         }
     });
 });
 </script>
 {% endblock %}
-
-

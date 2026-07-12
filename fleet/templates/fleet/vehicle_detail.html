@@ -2,159 +2,156 @@
 {% block title %}{{ vehicle.registration_number }} - Details{% endblock %}
 {% block content %}
 <!-- Header -->
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 animate-fade-in">
     <div>
         <a href="{% url 'fleet:vehicle_list' %}" class="inline-flex items-center gap-1 text-xs font-semibold text-primary dark:text-primary-fixed-dim hover:underline mb-2">
             <span class="material-symbols-outlined text-[14px]">arrow_back</span> Back to Fleet Overview
         </a>
-        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold leading-tight">{{ vehicle.registration_number }}</h1>
+        <h1 class="text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold leading-tight">{{ vehicle.registration_number }}</h1>
         <p class="text-sm text-on-surface-variant dark:text-surface-variant">{{ vehicle.name }} • {{ vehicle.model|default:'Heavy Duty' }}</p>
     </div>
     
     <div class="flex gap-2">
-        <a href="{% url 'fleet:vehicle_update' vehicle.pk %}" class="h-10 px-4 border border-outline-variant/50 text-on-surface dark:text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-low transition-colors shadow-sm">
-            <span class="material-symbols-outlined text-[16px]">edit</span>
-            Edit Vehicle
+        <a href="{% url 'fleet:vehicle_update' vehicle.pk %}" class="h-10 px-4 border border-outline-variant/50 dark:border-white/10 text-on-surface dark:text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-low dark:hover:bg-white/5 transition-colors">
+            <span class="material-symbols-outlined text-[16px]">edit</span> Edit Vehicle
         </a>
-        <a href="{% url 'fleet:vehicle_delete' vehicle.pk %}" class="h-10 px-4 border border-error/30 text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-error-container/20 transition-colors shadow-sm">
-            <span class="material-symbols-outlined text-[16px]">delete</span>
-            Delete
+        <a href="{% url 'fleet:vehicle_delete' vehicle.pk %}" class="h-10 px-4 border border-error/30 text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-error/5 transition-colors">
+            <span class="material-symbols-outlined text-[16px]">delete</span> Delete
         </a>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in" style="animation-delay: 0.1s;">
     <!-- Vehicle Information -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl border border-outline-variant/30 overflow-hidden relative shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
-        <div class="p-5 border-b border-outline-variant/20 bg-surface-container-low/20 dark:bg-outline-variant/5">
+    <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 overflow-hidden relative shadow-sm">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary opacity-60"></div>
+        <div class="p-5 border-b border-outline-variant/15 dark:border-white/5 bg-surface-container-low/30 dark:bg-white/[0.02]">
             <h3 class="text-sm font-bold text-on-surface dark:text-white uppercase tracking-wider">Specifications</h3>
         </div>
         <div class="p-5 space-y-4 text-sm">
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Name</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ vehicle.name }}</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Model</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ vehicle.model|default:'-' }}</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Vehicle Type</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ vehicle.vehicle_type }}</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Max Load Capacity</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ vehicle.max_load_capacity }} kg</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Odometer</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ vehicle.odometer }} km</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Region</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ vehicle.region|default:'-' }}</span>
             </div>
-            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Acquisition Cost</span>
                 <span class="font-bold text-primary dark:text-primary-fixed-dim">₹{{ vehicle.acquisition_cost|floatformat:2 }}</span>
             </div>
             <div class="flex justify-between items-center py-2">
                 <span class="text-outline font-medium">Status</span>
                 {% if vehicle.status == 'Available' %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-outline-variant/30 text-outline text-xs font-semibold">Idle</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-outline-variant/20 dark:bg-white/5 text-outline text-xs font-semibold">Idle</span>
                 {% elif vehicle.status == 'On Trip' %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-on-tertiary-container text-tertiary-container text-xs font-semibold">Active</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-tertiary-container/10 text-tertiary-container text-xs font-semibold">Active</span>
                 {% elif vehicle.status == 'In Shop' %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-semibold">In Shop</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-error-container/50 dark:bg-error/10 text-on-error-container text-xs font-semibold">In Shop</span>
                 {% else %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-semibold">Retired</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high dark:bg-white/5 text-on-surface-variant text-xs font-semibold">Retired</span>
                 {% endif %}
             </div>
         </div>
-        <div class="card mb-3">
-            <div class="card-header">Documents</div>
-            <div class="card-body">
-                <form method="post" action="{% url 'fleet:vehicle_upload_doc' vehicle.pk %}" enctype="multipart/form-data" class="mb-2">
-                    {% csrf_token %}
-                    <div class="input-group input-group-sm mb-1">
-                        <input type="text" name="document_type" class="form-control" placeholder="Type (e.g. Insurance)" required>
-                    </div>
-                    <div class="input-group input-group-sm mb-1">
-                        <input type="file" name="file" class="form-control" required>
-                        <button class="btn btn-primary" type="submit">Upload</button>
-                    </div>
-                </form>
-                {% for doc in vehicle.documents.all %}
-                    <p class="mb-1 small">
-                        <a href="{{ doc.file.url }}" target="_blank">{{ doc.document_type }}</a>
-                        <a href="{% url 'fleet:vehicle_delete_doc' vehicle.pk doc.pk %}" class="text-danger" onclick="return confirm('Delete this document?')"><i class="bi bi-x-circle"></i></a>
-                    </p>
-                {% empty %}
-                    <p class="text-muted small">No documents.</p>
-                {% endfor %}
-            </div>
+        <!-- Documents Section -->
+        <div class="p-5 border-t border-outline-variant/15 dark:border-white/5">
+            <h4 class="text-xs font-bold text-on-surface dark:text-white uppercase tracking-wider mb-3">Documents</h4>
+            <form method="post" action="{% url 'fleet:vehicle_upload_doc' vehicle.pk %}" enctype="multipart/form-data" class="mb-3">
+                {% csrf_token %}
+                <div class="flex gap-2 mb-2">
+                    <input type="text" name="document_type" placeholder="Type (e.g. Insurance)" required class="flex-1 px-3 py-1.5 text-xs bg-surface-container-low dark:bg-white/5 border border-outline-variant/30 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none dark:text-white transition-all"/>
+                </div>
+                <div class="flex gap-2">
+                    <input type="file" name="file" required class="flex-1 text-xs text-on-surface-variant dark:text-surface-variant file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors"/>
+                    <button type="submit" class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold btn-primary">Upload</button>
+                </div>
+            </form>
+            {% for doc in vehicle.documents.all %}
+                <div class="flex items-center justify-between py-1.5 text-xs">
+                    <a href="{{ doc.file.url }}" target="_blank" class="text-primary dark:text-primary-fixed-dim hover:underline font-medium">{{ doc.document_type }}</a>
+                    <a href="{% url 'fleet:vehicle_delete_doc' vehicle.pk doc.pk %}" class="text-error hover:text-error/80 transition-colors" onclick="return confirm('Delete this document?')" aria-label="Delete document">
+                        <span class="material-symbols-outlined text-[14px]">close</span>
+                    </a>
+                </div>
+            {% empty %}
+                <p class="text-xs text-outline">No documents uploaded.</p>
+            {% endfor %}
         </div>
     </div>
 
     <!-- Recent Trips -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl border border-outline-variant/30 overflow-hidden relative shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
-        <div class="p-5 border-b border-outline-variant/20 bg-surface-container-low/20 dark:bg-outline-variant/5">
+    <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 overflow-hidden relative shadow-sm">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary opacity-60"></div>
+        <div class="p-5 border-b border-outline-variant/15 dark:border-white/5 bg-surface-container-low/30 dark:bg-white/[0.02]">
             <h3 class="text-sm font-bold text-on-surface dark:text-white uppercase tracking-wider">Recent Trips</h3>
         </div>
         <div class="p-5 space-y-3">
             {% for t in trips %}
-                <div class="p-3 bg-surface-container-low dark:bg-outline-variant/10 border border-outline-variant/20 rounded-xl flex items-center justify-between gap-3 text-sm">
+                <div class="p-3 bg-surface-container-low/50 dark:bg-white/[0.03] border border-outline-variant/15 dark:border-white/5 rounded-xl flex items-center justify-between gap-3 text-sm transition-colors hover:bg-surface-container-low dark:hover:bg-white/[0.05]">
                     <div class="flex flex-col">
                         <span class="font-semibold text-on-surface dark:text-white">{{ t.source }} → {{ t.destination }}</span>
                         <span class="text-[10px] text-outline mt-0.5">TRP-{{ t.id }} • {{ t.driver.name }}</span>
                     </div>
                     {% if t.status == 'Completed' %}
-                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-primary/15 text-primary">Completed</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-primary/10 text-primary">Completed</span>
                     {% elif t.status == 'Dispatched' %}
-                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-on-tertiary-container text-tertiary-container">Dispatched</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-tertiary-container/10 text-tertiary-container">Dispatched</span>
                     {% else %}
-                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-outline-variant/35 text-outline">{{ t.status }}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-outline-variant/20 text-outline">{{ t.status }}</span>
                     {% endif %}
                 </div>
             {% empty %}
                 <div class="py-8 text-center text-outline text-sm">
-                    <span class="material-symbols-outlined text-[28px] opacity-40">map</span>
-                    <p class="mt-1">No trips logged yet.</p>
+                    <span class="material-symbols-outlined text-[28px] opacity-40 block mb-1">map</span>
+                    <p>No trips logged yet.</p>
                 </div>
             {% endfor %}
         </div>
     </div>
 
     <!-- Maintenance Records -->
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl border border-outline-variant/30 overflow-hidden relative shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
-        <div class="p-5 border-b border-outline-variant/20 bg-surface-container-low/20 dark:bg-outline-variant/5">
+    <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 overflow-hidden relative shadow-sm">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary opacity-60"></div>
+        <div class="p-5 border-b border-outline-variant/15 dark:border-white/5 bg-surface-container-low/30 dark:bg-white/[0.02]">
             <h3 class="text-sm font-bold text-on-surface dark:text-white uppercase tracking-wider">Maintenance History</h3>
         </div>
         <div class="p-5 space-y-3">
             {% for m in maintenance %}
-                <div class="p-3 bg-surface-container-low dark:bg-outline-variant/10 border border-outline-variant/20 rounded-xl flex items-center justify-between gap-3 text-sm">
+                <div class="p-3 bg-surface-container-low/50 dark:bg-white/[0.03] border border-outline-variant/15 dark:border-white/5 rounded-xl flex items-center justify-between gap-3 text-sm transition-colors hover:bg-surface-container-low dark:hover:bg-white/[0.05]">
                     <div class="flex flex-col">
                         <span class="font-semibold text-on-surface dark:text-white">{{ m.description|truncatechars:35 }}</span>
                         <span class="text-[10px] text-outline mt-0.5">{{ m.scheduled_date|date:"Y-m-d" }}{% if m.completed_date %} • Completed{% endif %}</span>
                     </div>
                     {% if m.status == 'Open' %}
-                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-error-container text-on-error-container">Open</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-error-container/50 dark:bg-error/10 text-on-error-container">Open</span>
                     {% else %}
-                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-on-tertiary-container text-tertiary-container">Resolved</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-tertiary-container/10 text-tertiary-container">Resolved</span>
                     {% endif %}
                 </div>
             {% empty %}
                 <div class="py-8 text-center text-outline text-sm">
-                    <span class="material-symbols-outlined text-[28px] opacity-40">handyman</span>
-                    <p class="mt-1">No maintenance records.</p>
+                    <span class="material-symbols-outlined text-[28px] opacity-40 block mb-1">handyman</span>
+                    <p>No maintenance records.</p>
                 </div>
             {% endfor %}
         </div>
     </div>
 </div>
 {% endblock %}
-
-

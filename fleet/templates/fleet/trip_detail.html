@@ -1,35 +1,35 @@
 {% extends 'base.html' %}
 {% block title %}Trip Details - TRP-{{ trip.id }}{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto mt-8">
+<div class="max-w-2xl mx-auto mt-8 animate-fade-in">
     <a href="{% url 'fleet:trip_list' %}" class="inline-flex items-center gap-1 text-xs font-semibold text-primary dark:text-primary-fixed-dim hover:underline mb-4">
         <span class="material-symbols-outlined text-[14px]">arrow_back</span> Back to Trips
     </a>
     
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.01)] overflow-hidden relative">
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
-        <div class="p-6 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low/20 dark:bg-outline-variant/5">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden relative">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary opacity-60"></div>
+        <div class="p-6 border-b border-outline-variant/15 dark:border-white/5 flex justify-between items-center bg-surface-container-low/30 dark:bg-white/[0.02]">
             <h2 class="text-xl font-bold text-on-surface dark:text-white tracking-tight">Trip Details #{{ trip.id }}</h2>
             {% if trip.status == 'Draft' %}
-                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-outline-variant/30 text-outline border border-outline-variant/50">Draft</span>
+                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-outline-variant/20 dark:bg-white/5 text-outline border border-outline-variant/30 dark:border-white/10">Draft</span>
             {% elif trip.status == 'Dispatched' %}
-                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-on-tertiary-container text-tertiary-container border border-tertiary-container/20">Dispatched</span>
+                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-tertiary-container/10 text-tertiary-container border border-tertiary-container/20">Dispatched</span>
             {% elif trip.status == 'Completed' %}
                 <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-primary/10 text-primary dark:text-primary-fixed-dim border border-primary/20">Completed</span>
             {% else %}
-                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-error-container text-on-error-container border border-error-container/50">Cancelled</span>
+                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-error-container/50 dark:bg-error/10 text-on-error-container border border-error/20">Cancelled</span>
             {% endif %}
         </div>
         <div class="p-6 space-y-4 text-sm">
-            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Vehicle assigned</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ trip.vehicle.registration_number }} ({{ trip.vehicle.name }})</span>
             </div>
-            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Driver in charge</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ trip.driver.name }}</span>
             </div>
-            <div class="flex justify-between items-start py-2.5 border-b border-outline-variant/10">
+            <div class="flex justify-between items-start py-2.5 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Route Vector</span>
                 <div class="flex items-center gap-1 font-bold text-on-surface dark:text-white">
                     <span>{{ trip.source }}</span>
@@ -37,28 +37,28 @@
                     <span>{{ trip.destination }}</span>
                 </div>
             </div>
-            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Cargo weight</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ trip.cargo_weight }} kg</span>
             </div>
-            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Planned Distance</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ trip.planned_distance }} km</span>
             </div>
             {% if trip.actual_distance %}
-            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Actual Distance</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ trip.actual_distance }} km</span>
             </div>
             {% endif %}
             {% if trip.dispatched_at %}
-            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Dispatched Time</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ trip.dispatched_at|date:"Y-m-d H:i" }}</span>
             </div>
             {% endif %}
             {% if trip.completed_at %}
-            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10">
+            <div class="flex justify-between items-center py-2.5 border-b border-outline-variant/10 dark:border-white/5">
                 <span class="text-outline font-medium">Completion Time</span>
                 <span class="font-semibold text-on-surface dark:text-white">{{ trip.completed_at|date:"Y-m-d H:i" }}</span>
             </div>
@@ -66,12 +66,10 @@
             {% if trip.fuel_consumed %}
             <div class="flex justify-between items-center py-2.5">
                 <span class="text-outline font-medium">Fuel Consumed</span>
-                <span class="font-bold text-secondary">{{ trip.fuel_consumed }} L</span>
+                <span class="font-bold text-secondary dark:text-secondary-fixed-dim">{{ trip.fuel_consumed }} L</span>
             </div>
             {% endif %}
         </div>
     </div>
 </div>
 {% endblock %}
-
-

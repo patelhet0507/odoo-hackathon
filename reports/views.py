@@ -154,14 +154,35 @@ def export_pdf(request):
         return HttpResponse('PDF export requires xhtml2pdf. Install with: pip install xhtml2pdf', status=501)
 
     vehicles = Vehicle.objects.all()
-    completed_trips = Trip.objects.filter(status=Trip.Status.COMPLETED).count()
-    total_op_cost = float(FuelLog.objects.aggregate(Sum('cost'))['cost__sum'] or 0) \
-                  + float(MaintenanceRecord.objects.aggregate(Sum('cost'))['cost__sum'] or 0)
+    drivers = Driver.objects.all()
+    trips = Trip.objects.select_related('vehicle', 'driver').all()
+    fuel_logs = FuelLog.objects.select_related('vehicle').all()
+    maintenance = MaintenanceRecord.objects.select_related('vehicle').all()
+    expenses = Expense.objects.select_related('vehicle').all()
+
+    completed_trips = trips.filter(status=Trip.Status.COMPLETED).count()
+    active_trips = trips.filter(status=Trip.Status.DISPATCHED).count()
+    cancelled_trips = trips.filter(status=Trip.Status.CANCELLED).count()
+
+    total_fuel_cost = float(fuel_logs.aggregate(Sum('cost'))['cost__sum'] or 0)
+    total_maint_cost = float(maintenance.aggregate(Sum('cost'))['cost__sum'] or 0)
+    total_expense = float(expenses.aggregate(Sum('amount'))['amount__sum'] or 0)
+    total_op_cost = round(total_fuel_cost + total_maint_cost + total_expense, 2)
 
     html = get_template('reports/pdf_report.html').render({
         'vehicles': vehicles,
+        'drivers': drivers,
+        'trips': trips,
+        'fuel_logs': fuel_logs,
+        'maintenance': maintenance,
+        'expenses': expenses,
         'completed_trips': completed_trips,
-        'total_op_cost': round(total_op_cost, 2),
+        'active_trips': active_trips,
+        'cancelled_trips': cancelled_trips,
+        'total_op_cost': total_op_cost,
+        'total_vehicles': vehicles.count(),
+        'total_drivers': drivers.count(),
+        'total_trips': trips.count(),
         'generated_at': __import__('datetime').datetime.now(),
     })
     response = HttpResponse(content_type='application/pdf')

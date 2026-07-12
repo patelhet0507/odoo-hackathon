@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}Delete Vehicle - TransitOps{% endblock %}
 {% block content %}
-<div class="max-w-md mx-auto mt-16">
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-error/30 rounded-2xl shadow-xl overflow-hidden relative">
-        <div class="absolute top-0 left-0 right-0 h-1 bg-error"></div>
+<div class="max-w-md mx-auto mt-16 animate-scale-in">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-error/30 dark:border-error/20 rounded-2xl shadow-xl overflow-hidden relative">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-error"></div>
         <div class="p-6 text-center">
-            <div class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center mx-auto mb-4">
+            <div class="w-12 h-12 rounded-full bg-error-container/50 dark:bg-error/10 text-on-error-container flex items-center justify-center mx-auto mb-4">
                 <span class="material-symbols-outlined text-[28px]">warning</span>
             </div>
             
@@ -14,10 +14,10 @@
             
             <form method="post" class="flex items-center justify-center gap-3 mt-6">
                 {% csrf_token %}
-                <button type="submit" class="px-4 py-2 bg-error text-on-error hover:bg-opacity-90 rounded-xl font-semibold text-sm transition-all shadow-sm">
+                <button type="submit" class="px-5 py-2.5 bg-error text-white hover:bg-error/90 rounded-xl font-semibold text-sm transition-all shadow-sm">
                     Yes, Delete
                 </button>
-                <a href="{% url 'fleet:vehicle_list' %}" class="px-4 py-2 border border-outline-variant/50 text-on-surface dark:text-white rounded-xl font-semibold text-sm hover:bg-surface-container-low transition-colors">
+                <a href="{% url 'fleet:vehicle_list' %}" class="px-5 py-2.5 border border-outline-variant/50 dark:border-white/10 text-on-surface dark:text-white rounded-xl font-semibold text-sm hover:bg-surface-container-low dark:hover:bg-white/5 transition-colors">
                     Cancel
                 </a>
             </form>
@@ -25,5 +25,3 @@
     </div>
 </div>
 {% endblock %}
-
-

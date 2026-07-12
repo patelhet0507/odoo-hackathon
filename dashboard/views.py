@@ -65,6 +65,10 @@ def home(request):
     status_filter = request.GET.get('status', '')
     region_filter = request.GET.get('region', '')
 
+    vehicle_type_filter = request.GET.get('type', '')
+    status_filter = request.GET.get('status', '')
+    region_filter = request.GET.get('region', '')
+
     context = {
         'total_vehicles': total_vehicles,
         'active_vehicles': active_vehicles,
