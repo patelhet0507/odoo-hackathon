@@ -303,6 +303,7 @@
     </script>
     <!-- Micro-interactions System -->
     <script src="/static/js/animations.js" defer></script>
+    <script src="/static/js/ui.js" defer></script>
 </head>
 <body class="bg-background dark:bg-[#121218] text-on-surface dark:text-inverse-on-surface font-body-md antialiased overflow-hidden flex h-screen">
 
@@ -486,19 +487,28 @@
     </header>
     {% endif %}
 
-    <!-- Django Flash Messages -->
-    {% if messages %}
-    <div class="absolute top-18 right-6 z-50 flex flex-col gap-2 max-w-sm" aria-live="polite">
+    <!-- Toast Container + Server Messages (promoted to toasts by ui.js) -->
+    <div id="toastContainer" class="fixed top-18 right-6 z-[70] flex flex-col gap-2 max-w-sm" aria-live="polite"></div>
+    <div id="serverMessages" class="hidden">
         {% for message in messages %}
-        <div class="p-4 rounded-xl border flex items-center justify-between gap-4 shadow-lg animate-slide-in {% if message.tags == 'success' %}bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800/40 text-green-800 dark:text-green-200{% elif message.tags == 'error' %}bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/40 text-red-800 dark:text-red-200{% else %}bg-surface-container-high dark:bg-outline-variant/10 border-outline-variant/30 text-on-surface-variant{% endif %}" role="alert">
-            <span class="text-sm font-medium">{{ message }}</span>
-            <button onclick="this.parentElement.remove()" class="text-outline hover:text-on-surface p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" aria-label="Dismiss">
-                <span class="material-symbols-outlined text-[16px]">close</span>
-            </button>
-        </div>
+        <div data-toast-type="{{ message.tags }}" data-toast-msg="{{ message }}"></div>
         {% endfor %}
     </div>
-    {% endif %}
+
+    <!-- Generic Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity" role="dialog" aria-modal="true">
+        <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/10 rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-scale-in">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="material-symbols-outlined text-[28px] text-error">warning</span>
+                <h3 id="confirmTitle" class="text-lg font-bold text-on-surface dark:text-white">Confirm Action</h3>
+            </div>
+            <p id="confirmMessage" class="text-sm text-on-surface-variant dark:text-surface-variant mb-6"></p>
+            <div class="flex justify-end gap-2">
+                <button id="confirmCancel" class="px-4 py-2 rounded-xl text-sm font-semibold bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-white hover:bg-surface-container-high transition-all">Cancel</button>
+                <button id="confirmOk" class="px-4 py-2 rounded-xl text-sm font-semibold bg-primary text-white hover:bg-secondary transition-all">Confirm</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Page Content Scroll Area -->
     <div class="flex-1 overflow-y-auto p-4 md:p-6">

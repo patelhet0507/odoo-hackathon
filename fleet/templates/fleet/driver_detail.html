@@ -16,9 +16,12 @@
         <a href="{% url 'fleet:driver_update' driver.pk %}" class="h-10 px-4 border border-outline-variant/50 dark:border-white/10 text-on-surface dark:text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-low dark:hover:bg-white/5 transition-colors">
             <span class="material-symbols-outlined text-[16px]">edit</span> Edit Profile
         </a>
-        <a href="{% url 'fleet:driver_delete' driver.pk %}" class="h-10 px-4 border border-error/30 text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-error/5 transition-colors">
-            <span class="material-symbols-outlined text-[16px]">delete</span> Delete
-        </a>
+        <form method="post" action="{% url 'fleet:driver_delete' driver.pk %}" data-ajax data-confirm="Delete this driver? This action cannot be undone." data-confirm-danger data-confirm-ok="Delete Driver" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="h-10 px-4 border border-error/30 text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-error/5 transition-colors">
+                <span class="material-symbols-outlined text-[16px]">delete</span> Delete
+            </button>
+        </form>
         {% endif %}
     </div>
 </div>

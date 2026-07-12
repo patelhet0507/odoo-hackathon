@@ -26,6 +26,11 @@ def paginate(request, queryset, per_page=20):
     return queryset[start:end], page, pages
 
 
+def _is_ajax(request):
+    return (request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+            or 'application/json' in request.META.get('HTTP_ACCEPT', ''))
+
+
 def search_queryset(request, queryset, fields):
     q = request.GET.get('q', '').strip()
     if q:
@@ -104,8 +109,11 @@ def vehicle_update(request, pk):
 def vehicle_delete(request, pk):
     vehicle = get_object_or_404(Vehicle, pk=pk)
     if request.method == 'POST':
+        name = vehicle.registration_number
         vehicle.delete()
-        messages.success(request, 'Vehicle deleted.')
+        if _is_ajax(request):
+            return JsonResponse({'status': 'ok', 'message': f'Vehicle {name} deleted.', 'type': 'success'})
+        messages.success(request, f'Vehicle {name} deleted.')
         return redirect('fleet:vehicle_list')
     return render(request, 'fleet/vehicle_confirm_delete.html', {'object': vehicle})
 
@@ -197,8 +205,11 @@ def driver_update(request, pk):
 def driver_delete(request, pk):
     driver = get_object_or_404(Driver, pk=pk)
     if request.method == 'POST':
+        name = driver.name
         driver.delete()
-        messages.success(request, 'Driver deleted.')
+        if _is_ajax(request):
+            return JsonResponse({'status': 'ok', 'message': f'Driver {name} deleted.', 'type': 'success'})
+        messages.success(request, f'Driver {name} deleted.')
         return redirect('fleet:driver_list')
     return render(request, 'fleet/driver_confirm_delete.html', {'object': driver})
 
@@ -469,27 +480,30 @@ def notification_list(request):
 
 
 @login_required
-@require_POST
 def notification_mark_read(request, pk):
     notification = get_object_or_404(Notification, pk=pk, user=request.user)
     notification.is_read = True
     notification.save()
-    return JsonResponse({'status': 'ok'})
+    if _is_ajax(request):
+        return JsonResponse({'status': 'ok', 'message': 'Marked as read', 'type': 'success'})
+    return redirect('fleet:notification_list')
 
 
 @login_required
-@require_POST
 def notification_mark_all_read(request):
     Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
-    return JsonResponse({'status': 'ok'})
+    if _is_ajax(request):
+        return JsonResponse({'status': 'ok', 'message': 'All notifications marked as read', 'type': 'success'})
+    return redirect('fleet:notification_list')
 
 
 @login_required
-@require_POST
 def notification_delete(request, pk):
     notification = get_object_or_404(Notification, pk=pk, user=request.user)
     notification.delete()
-    return JsonResponse({'status': 'ok'})
+    if _is_ajax(request):
+        return JsonResponse({'status': 'ok', 'message': 'Notification deleted', 'type': 'success'})
+    return redirect('fleet:notification_list')
 
 
 @login_required
@@ -570,7 +584,9 @@ def vehicle_route_json(request, pk):
 @login_required
 def simulate_location(request):
     if request.user.role != User.Role.FLEET_MANAGER:
-        return JsonResponse({'error': 'Not authorized'}, status=403)
+        if _is_ajax(request):
+            return JsonResponse({'error': 'Not authorized'}, status=403)
+        return redirect('fleet:live_tracking')
     for v in Vehicle.objects.filter(status=Vehicle.Status.ON_TRIP):
         old = v.locations.filter(is_active=True).first()
         base_lat = float(old.latitude) if old else 19.0760
@@ -588,7 +604,9 @@ def simulate_location(request):
             max_id=Count('id')
         ).values('max_id')
     ).update(is_active=False)
-    return JsonResponse({'status': 'ok'})
+    if _is_ajax(request):
+        return JsonResponse({'status': 'ok', 'message': 'GPS positions updated', 'type': 'success'})
+    return redirect('fleet:live_tracking')
 
 
 

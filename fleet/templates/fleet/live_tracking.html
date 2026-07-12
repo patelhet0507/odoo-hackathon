@@ -135,7 +135,7 @@ function simulateGPS() {
     var btn = event.target.closest('button');
     btn.disabled = true;
     btn.textContent = 'Simulating...';
-    fetch('{% url "fleet:simulate_location" %}', { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } })
+    fetch('{% url "fleet:simulate_location" %}', { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => r.json())
         .then(function() { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">my_location</span> Simulate GPS'; updateLocations(); })
         .catch(function() { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">my_location</span> Simulate GPS'; });

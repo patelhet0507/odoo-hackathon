@@ -6,7 +6,7 @@
         <h1 class="text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Notifications</h1>
         <p class="text-sm text-on-surface-variant dark:text-surface-variant">Stay informed about system events and updates.</p>
     </div>
-    <form method="post" action="{% url 'fleet:notification_mark_all_read' %}" class="inline">
+    <form method="post" action="{% url 'fleet:notification_mark_all_read' %}" class="inline" data-ajax>
         {% csrf_token %}
         <button type="submit" class="h-10 px-4 bg-primary text-white rounded-xl font-medium text-sm flex items-center gap-2 btn-primary whitespace-nowrap shrink-0">
             <span class="material-symbols-outlined text-[16px]">done_all</span>
@@ -49,16 +49,16 @@
         </div>
         <div class="flex items-center gap-1 shrink-0">
             {% if not n.is_read %}
-            <form method="post" action="{% url 'fleet:notification_mark_read' n.pk %}">
+            <form method="post" action="{% url 'fleet:notification_mark_read' n.pk %}" data-ajax>
                 {% csrf_token %}
                 <button type="submit" class="p-1.5 text-outline hover:text-primary rounded-lg hover:bg-primary/10 transition-colors" title="Mark as read">
                     <span class="material-symbols-outlined text-[16px]">check_circle</span>
                 </button>
             </form>
             {% endif %}
-            <form method="post" action="{% url 'fleet:notification_delete' n.pk %}">
+            <form method="post" action="{% url 'fleet:notification_delete' n.pk %}" data-ajax data-confirm="Delete this notification?" data-confirm-danger data-confirm-ok="Delete">
                 {% csrf_token %}
-                <button type="submit" class="p-1.5 text-outline hover:text-error rounded-lg hover:bg-error/10 transition-colors" title="Delete" onclick="return confirm('Delete this notification?')">
+                <button type="submit" class="p-1.5 text-outline hover:text-error rounded-lg hover:bg-error/10 transition-colors" title="Delete">
                     <span class="material-symbols-outlined text-[16px]">delete</span>
                 </button>
             </form>

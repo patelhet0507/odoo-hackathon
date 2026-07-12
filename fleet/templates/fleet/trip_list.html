@@ -100,7 +100,7 @@
                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
                             </a>
                             {% if t.status == 'Draft' and is_fleet_manager %}
-                                <a href="{% url 'fleet:trip_dispatch' t.pk %}" class="px-2.5 py-1 bg-tertiary-container text-on-tertiary-container rounded-lg text-xs font-semibold hover:opacity-90 transition-all flex items-center gap-1" onclick="return confirm('Dispatch this trip?')" aria-label="Dispatch trip">
+                                <a href="{% url 'fleet:trip_dispatch' t.pk %}" class="px-2.5 py-1 bg-tertiary-container text-on-tertiary-container rounded-lg text-xs font-semibold hover:opacity-90 transition-all flex items-center gap-1" data-confirm="Dispatch this trip?" data-confirm-ok="Dispatch" aria-label="Dispatch trip">
                                     <span class="material-symbols-outlined text-[14px]">send</span> Dispatch
                                 </a>
                             {% endif %}
@@ -111,7 +111,7 @@
                             {% endif %}
                             {% if t.status == 'Draft' or t.status == 'Dispatched' %}
                                 {% if is_fleet_manager or is_driver %}
-                                <a href="{% url 'fleet:trip_cancel' t.pk %}" class="p-1.5 text-on-surface-variant hover:text-error dark:text-surface-variant hover:bg-error/10 rounded-lg transition-all" title="Cancel Trip" onclick="return confirm('Cancel this trip?')" aria-label="Cancel trip">
+                                <a href="{% url 'fleet:trip_cancel' t.pk %}" class="p-1.5 text-on-surface-variant hover:text-error dark:text-surface-variant hover:bg-error/10 rounded-lg transition-all" title="Cancel Trip" data-confirm="Cancel this trip?" data-confirm-danger data-confirm-ok="Cancel" aria-label="Cancel trip">
                                     <span class="material-symbols-outlined text-[18px]">cancel</span>
                                 </a>
                                 {% endif %}

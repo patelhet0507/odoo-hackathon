@@ -42,26 +42,26 @@
 <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl shadow-sm border border-outline-variant/20 dark:border-white/5 overflow-hidden relative reveal">
     <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-secondary to-tertiary-fixed-dim opacity-60"></div>
     <div class="overflow-x-auto">
-        <table class="w-full text-left data-table" aria-label="Audit logs">
+        <table class="w-full text-left data-table table-fixed" aria-label="Audit logs">
             <thead>
                 <tr class="border-b border-outline-variant/20 dark:border-white/5 bg-surface-container-low/50 dark:bg-white/[0.02]">
-                    <th class="py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Timestamp</th>
-                    <th class="py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">User</th>
-                    <th class="py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Role</th>
-                    <th class="py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Action</th>
-                    <th class="py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Module</th>
-                    <th class="py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Object</th>
-                    <th class="py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider hidden md:table-cell">IP Address</th>
+                    <th class="w-[16%] py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Timestamp</th>
+                    <th class="w-[14%] py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">User</th>
+                    <th class="w-[12%] py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Role</th>
+                    <th class="w-[12%] py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Action</th>
+                    <th class="w-[12%] py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Module</th>
+                    <th class="w-[22%] py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider">Object</th>
+                    <th class="w-[12%] py-3.5 px-4 font-semibold text-[11px] text-outline uppercase tracking-wider hidden md:table-cell">IP Address</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant/10 dark:divide-white/5 text-sm">
                 {% for log in logs %}
                 <tr class="hover:bg-primary/[0.02] dark:hover:bg-white/[0.03] transition-colors group relative tr-indicator-row">
-                    <td class="py-3 px-4 text-outline text-xs font-mono">{{ log.created_at|date:"Y-m-d H:i:s" }}</td>
-                    <td class="py-3 px-4">
-                        <div class="font-medium text-on-surface dark:text-white">{{ log.username }}</div>
+                    <td class="py-3 px-4 text-outline text-xs font-mono whitespace-nowrap">{{ log.created_at|date:"Y-m-d H:i:s" }}</td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <div class="font-medium text-on-surface dark:text-white truncate">{{ log.username }}</div>
                     </td>
-                    <td class="py-3 px-4">
+                    <td class="py-3 px-4 whitespace-nowrap">
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold
                             {% if log.role == 'fleet_manager' %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim
                             {% elif log.role == 'driver' %}bg-tertiary-container/10 text-tertiary dark:bg-tertiary-container/20 dark:text-tertiary-fixed-dim
@@ -71,7 +71,7 @@
                             {{ log.get_role_display|default:log.role }}
                         </span>
                     </td>
-                    <td class="py-3 px-4">
+                    <td class="py-3 px-4 whitespace-nowrap">
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold
                             {% if log.action == 'create' %}bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300
                             {% elif log.action == 'update' %}bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300
@@ -82,9 +82,9 @@
                             {{ log.action|upper }}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-on-surface-variant">{{ log.module }}</td>
-                    <td class="py-3 px-4 text-on-surface-variant truncate max-w-[200px]" title="{{ log.object_repr }}">{{ log.object_repr|truncatechars:40 }}</td>
-                    <td class="py-3 px-4 text-outline text-xs font-mono hidden md:table-cell">{{ log.ip_address|default:"-" }}</td>
+                    <td class="py-3 px-4 text-on-surface-variant whitespace-nowrap">{{ log.module }}</td>
+                    <td class="py-3 px-4 text-on-surface-variant truncate" title="{{ log.object_repr }}">{{ log.object_repr|truncatechars:40 }}</td>
+                    <td class="py-3 px-4 text-outline text-xs font-mono whitespace-nowrap hidden md:table-cell">{{ log.ip_address|default:"-" }}</td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="7" class="py-12 text-center text-outline text-sm">No audit logs found.</td></tr>

@@ -73,7 +73,7 @@
                     </td>
                     <td class="py-3.5 px-6 text-right">
                         {% if r.status == 'Open' %}
-                            <a href="{% url 'fleet:maintenance_close' r.pk %}" class="px-2.5 py-1 bg-tertiary-container text-on-tertiary-container rounded-lg text-xs font-semibold hover:opacity-90 transition-all inline-flex items-center gap-1" onclick="return confirm('Close this maintenance record?')" aria-label="Close maintenance ticket">
+                            <a href="{% url 'fleet:maintenance_close' r.pk %}" class="px-2.5 py-1 bg-tertiary-container text-on-tertiary-container rounded-lg text-xs font-semibold hover:opacity-90 transition-all inline-flex items-center gap-1" data-confirm="Close this maintenance record?" data-confirm-ok="Close" aria-label="Close maintenance ticket">
                                 <span class="material-symbols-outlined text-[14px]">done_all</span> Close Ticket
                             </a>
                         {% else %}

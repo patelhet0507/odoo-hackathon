@@ -124,9 +124,12 @@
                             <a href="{% url 'fleet:driver_update' d.pk %}" class="p-1.5 text-on-surface-variant hover:text-primary dark:text-surface-variant hover:bg-primary/10 rounded-lg transition-all" title="Edit Driver" aria-label="Edit driver">
                                 <span class="material-symbols-outlined text-[18px]">edit</span>
                             </a>
-                            <a href="{% url 'fleet:driver_delete' d.pk %}" class="p-1.5 text-on-surface-variant hover:text-error dark:text-surface-variant hover:bg-error/10 rounded-lg transition-all" title="Delete Driver" aria-label="Delete driver">
-                                <span class="material-symbols-outlined text-[18px]">delete</span>
-                            </a>
+                            <form method="post" action="{% url 'fleet:driver_delete' d.pk %}" data-ajax data-confirm="Delete this driver? This action cannot be undone." data-confirm-danger data-confirm-ok="Delete">
+                                {% csrf_token %}
+                                <button type="submit" class="p-1.5 text-on-surface-variant hover:text-error dark:text-surface-variant hover:bg-error/10 rounded-lg transition-all" title="Delete Driver" aria-label="Delete driver">
+                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                </button>
+                            </form>
                             {% endif %}
                         </div>
                     </td>

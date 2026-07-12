@@ -16,9 +16,12 @@
         <a href="{% url 'fleet:vehicle_update' vehicle.pk %}" class="h-10 px-4 border border-outline-variant/50 dark:border-white/10 text-on-surface dark:text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-low dark:hover:bg-white/5 transition-colors">
             <span class="material-symbols-outlined text-[16px]">edit</span> Edit Vehicle
         </a>
-        <a href="{% url 'fleet:vehicle_delete' vehicle.pk %}" class="h-10 px-4 border border-error/30 text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-error/5 transition-colors">
-            <span class="material-symbols-outlined text-[16px]">delete</span> Delete
-        </a>
+        <form method="post" action="{% url 'fleet:vehicle_delete' vehicle.pk %}" data-ajax data-confirm="Delete this vehicle? This action cannot be undone." data-confirm-danger data-confirm-ok="Delete Vehicle" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="h-10 px-4 border border-error/30 text-error rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-error/5 transition-colors">
+                <span class="material-symbols-outlined text-[16px]">delete</span> Delete
+            </button>
+        </form>
         {% endif %}
     </div>
 </div>
@@ -91,7 +94,7 @@
                 <div class="flex items-center justify-between py-1.5 text-xs">
                     <a href="{{ doc.file.url }}" target="_blank" class="text-primary dark:text-primary-fixed-dim hover:underline font-medium">{{ doc.document_type }}</a>
                     {% if is_fleet_manager %}
-                    <a href="{% url 'fleet:vehicle_delete_doc' vehicle.pk doc.pk %}" class="text-error hover:text-error/80 transition-colors" onclick="return confirm('Delete this document?')" aria-label="Delete document">
+                    <a href="{% url 'fleet:vehicle_delete_doc' vehicle.pk doc.pk %}" class="text-error hover:text-error/80 transition-colors" data-confirm="Delete this document?" data-confirm-danger data-confirm-ok="Delete" aria-label="Delete document">
                         <span class="material-symbols-outlined text-[14px]">close</span>
                     </a>
                     {% endif %}
