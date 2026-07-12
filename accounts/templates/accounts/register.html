@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Create Account - TransitOps{% endblock %}
+{% block content %}
+<div class="min-h-[calc(100vh-32px)] flex items-center justify-center -m-4 md:-m-6 relative overflow-hidden bg-background dark:bg-[#121218]">
+  <div class="absolute w-96 h-96 bg-primary/8 rounded-full blur-3xl -top-12 -left-12 animate-pulse"></div>
+  <div class="absolute w-96 h-96 bg-secondary/6 rounded-full blur-3xl -bottom-12 -right-12 animate-pulse" style="animation-delay: 1s;"></div>
+
+  <div class="w-full max-w-lg p-6 relative z-10">
+    <div class="flex flex-col items-center mb-8 animate-fade-in">
+      <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-[0_8px_30px_rgb(65,67,213,0.3)] mb-4">
+        <span class="material-symbols-outlined text-white text-3xl">local_shipping</span>
+      </div>
+      <h1 class="text-3xl font-bold tracking-tight text-primary dark:text-primary-fixed">TRANSITOPS</h1>
+      <p class="text-xs text-outline tracking-widest uppercase font-semibold mt-1">Create Your Account</p>
+    </div>
+
+    <div class="bg-white/80 dark:bg-[#1E1E2F]/80 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-xl p-8 animate-fade-in" style="animation-delay: 0.1s;">
+      <h2 class="text-xl font-bold text-on-surface dark:text-white mb-6">Get Started</h2>
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-on-surface-variant dark:text-surface-variant mb-1.5">First Name</label>
+            {{ form.first_name }}
+          </div>
+          <div>
+            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-on-surface-variant dark:text-surface-variant mb-1.5">Last Name</label>
+            {{ form.last_name }}
+          </div>
+        </div>
+
+        <div>
+          <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-on-surface-variant dark:text-surface-variant mb-1.5">Username</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">person</span>
+            {{ form.username }}
+          </div>
+          {% if form.username.errors %}<p class="text-xs text-error mt-1">{{ form.username.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-on-surface-variant dark:text-surface-variant mb-1.5">Email</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">mail</span>
+            {{ form.email }}
+          </div>
+          {% if form.email.errors %}<p class="text-xs text-error mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.role.id_for_label }}" class="block text-sm font-medium text-on-surface-variant dark:text-surface-variant mb-1.5">Role</label>
+          {{ form.role }}
+        </div>
+
+        <div>
+          <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-on-surface-variant dark:text-surface-variant mb-1.5">Phone</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">call</span>
+            {{ form.phone }}
+          </div>
+        </div>
+
+        <div>
+          <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-on-surface-variant dark:text-surface-variant mb-1.5">Password</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">lock</span>
+            {{ form.password1 }}
+          </div>
+          {% if form.password1.errors %}<p class="text-xs text-error mt-1">{{ form.password1.errors.0 }}</p>{% endif %}
+          {% if form.password1.help_text %}<p class="text-xs text-outline mt-1">{{ form.password1.help_text|safe }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-on-surface-variant dark:text-surface-variant mb-1.5">Confirm Password</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">lock</span>
+            {{ form.password2 }}
+          </div>
+          {% if form.password2.errors %}<p class="text-xs text-error mt-1">{{ form.password2.errors.0 }}</p>{% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="p-3 rounded-lg bg-error/10 border border-error/20 text-error text-xs flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px]">error</span>
+          <span>{{ form.non_field_errors.0 }}</span>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="w-full py-3 bg-primary text-white hover:bg-secondary-container dark:hover:bg-primary-container rounded-xl font-medium text-sm transition-all shadow-[0_4px_14px_0_rgba(65,67,213,0.3)] hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+          Create Account
+        </button>
+      </form>
+
+      <p class="text-center text-xs text-on-surface-variant dark:text-surface-variant mt-6">
+        Already have an account?
+        <a href="{% url 'login' %}" class="text-primary dark:text-primary-fixed-dim font-semibold hover:underline">Sign In</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

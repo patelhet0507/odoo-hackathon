@@ -127,9 +127,9 @@
 
         /* === Slide-over === */
         .slide-over-enter { transform: translateX(100%); }
-        .slide-over-enter-active { transform: translateX(0); transition: transform 300ms ease-in-out; }
+        .slide-over-enter-active { transform: translateX(0); transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1); }
         .slide-over-leave { transform: translateX(0); }
-        .slide-over-leave-active { transform: translateX(100%); transition: transform 300ms ease-in-out; }
+        .slide-over-leave-active { transform: translateX(100%); transition: transform 250ms ease-in; }
 
         /* === Table === */
         .table-row-hover:hover { background-color: #F8FAFC; cursor: pointer; }
@@ -270,6 +270,16 @@
         .btn-primary:active { transform: translateY(0); box-shadow: 0 1px 4px rgba(65, 67, 213, 0.2); }
         .btn-primary:focus-visible { outline: 2px solid #4143d5; outline-offset: 2px; }
 
+        /* === Spring Easing Helper === */
+        .spring-enter { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .spring-enter { opacity: 0; transform: scale(0.95); }
+        .spring-enter-active { opacity: 1; transform: scale(1); }
+
+        /* === Table Row Indicator (pseudo-element) === */
+        .tr-indicator-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #4143d5; transform: scaleY(0); transition: transform 0.2s ease; border-radius: 0 2px 2px 0; }
+        .tr-indicator-row:hover::before { transform: scaleY(1); }
+        .tr-indicator-row { position: relative; }
+
         /* === Focus Visible (Accessibility) === */
         *:focus-visible {
             outline: 2px solid #4143d5;
@@ -283,14 +293,16 @@
             body { background: white !important; }
         }
     </style>
+    <!-- Init theme early to prevent flicker -->
     <script>
-        // Init theme early to prevent flicker
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
     </script>
+    <!-- Micro-interactions System -->
+    <script src="/static/js/animations.js" defer></script>
 </head>
 <body class="bg-background dark:bg-[#121218] text-on-surface dark:text-inverse-on-surface font-body-md antialiased overflow-hidden flex h-screen">
 

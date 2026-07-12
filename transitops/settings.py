@@ -4,7 +4,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-key-change-in-prod')
-DEBUG = False
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -64,7 +64,7 @@ if DATABASE_URL and HAS_POSTGRES:
     DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
 elif HAS_POSTGRES:
     import dj_database_url
-    DATABASES = {'default': dj_database_url.config(default=DATABASE_URL or 'postgresql://postgres.bpmtafoikxboqfjgyqrp:0507%40Hetpatel@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres')}
+    DATABASES = {'default': dj_database_url.config(default='postgresql://postgres.bpmtafoikxboqfjgyqrp:0507%40Hetpatel@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres')}
 else:
     DATABASES = {
         'default': {

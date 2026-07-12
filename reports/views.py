@@ -145,6 +145,42 @@ def export_csv(request, model_name):
         for f in FuelLog.objects.select_related('vehicle').all():
             writer.writerow([f.vehicle.registration_number, f.trip_id, f.liters, f.cost, f.date])
 
+    elif model_name == 'vehicle':
+        vid = request.GET.get('v')
+        v = Vehicle.objects.filter(pk=vid).first()
+        if not v:
+            return HttpResponse('Vehicle not found', status=404)
+        writer.writerow(['=== VEHICLE INFO ==='])
+        writer.writerow(['Registration', 'Name', 'Model', 'Type', 'Max Load (kg)', 'Odometer (km)',
+                         'Acquisition Cost', 'Status', 'Region', 'Health Score'])
+        writer.writerow([v.registration_number, v.name, v.model, v.vehicle_type,
+                        v.max_load_capacity, v.odometer, v.acquisition_cost, v.status,
+                        v.region, getattr(v, 'health_score', 'N/A')])
+        writer.writerow([])
+        writer.writerow(['=== TRIPS ==='])
+        writer.writerow(['ID', 'Source', 'Destination', 'Driver', 'Cargo (kg)',
+                         'Distance (km)', 'Status', 'Created'])
+        for t in Trip.objects.filter(vehicle=v).select_related('driver'):
+            writer.writerow([t.id, t.source, t.destination, t.driver.name,
+                            t.cargo_weight, t.planned_distance, t.status, t.created_at])
+        writer.writerow([])
+        writer.writerow(['=== MAINTENANCE ==='])
+        writer.writerow(['Type', 'Description', 'Scheduled', 'Completed', 'Cost', 'Status'])
+        for m in MaintenanceRecord.objects.filter(vehicle=v):
+            writer.writerow([m.maintenance_type, m.description, m.scheduled_date,
+                            m.completed_date or '', m.cost, m.status])
+        writer.writerow([])
+        writer.writerow(['=== FUEL LOGS ==='])
+        writer.writerow(['Liters', 'Cost', 'Date', 'Trip'])
+        for f in FuelLog.objects.filter(vehicle=v).select_related('trip'):
+            writer.writerow([f.liters, f.cost, f.date,
+                            f'{f.trip.source} → {f.trip.destination}' if f.trip else ''])
+        writer.writerow([])
+        writer.writerow(['=== EXPENSES ==='])
+        writer.writerow(['Type', 'Amount', 'Description', 'Date'])
+        for e in Expense.objects.filter(vehicle=v):
+            writer.writerow([e.expense_type, e.amount, e.description, e.date])
+
     return response
 
 

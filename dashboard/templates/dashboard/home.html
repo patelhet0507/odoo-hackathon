@@ -37,13 +37,13 @@
 </div>
 
 <!-- KPI Cards Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stagger-group">
     <!-- Active Vehicles -->
-    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.05s;">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in stagger-item" style="animation-delay: 0.05s;">
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Active Vehicles</span>
-                <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">{{ active_vehicles }}</h2>
+                <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1"><span data-count-to="{{ active_vehicles }}">0</span></h2>
                 <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ available_vehicles }} available</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
@@ -53,11 +53,11 @@
     </div>
 
     <!-- In Maintenance -->
-    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in stagger-item" style="animation-delay: 0.1s;">
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">In Shop</span>
-                <h2 class="text-3xl font-bold text-error mt-1">{{ in_shop_vehicles }}</h2>
+                <h2 class="text-3xl font-bold text-error dark:text-red-300 mt-1"><span data-count-to="{{ in_shop_vehicles }}">0</span></h2>
                 <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ open_maintenance }} open records</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-error/10 dark:bg-error/20 flex items-center justify-center text-error">
@@ -67,11 +67,11 @@
     </div>
 
     <!-- Active Trips -->
-    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.15s;">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in stagger-item" style="animation-delay: 0.15s;">
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Active Trips</span>
-                <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ active_trips }}</h2>
+                <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1"><span data-count-to="{{ active_trips }}">0</span></h2>
                 <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ pending_trips }} pending draft</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 dark:bg-tertiary-container/20 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
@@ -81,11 +81,11 @@
     </div>
 
     <!-- Fleet Utilization -->
-    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in" style="animation-delay: 0.2s;">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in stagger-item" style="animation-delay: 0.2s;">
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Fleet Utilization</span>
-                <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">{{ fleet_utilization }}%</h2>
+                <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1"><span data-count-to="{{ fleet_utilization }}" data-count-suffix="%">0</span></h2>
                 <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ total_vehicles }} total vehicles</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
@@ -96,65 +96,65 @@
 </div>
 
 <!-- KPI Row 2: Financial & Maintenance -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stagger-group">
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between card-hover stagger-item">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Fuel Cost</span>
-            <h2 class="text-2xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">₹{{ total_fuel_cost|floatformat:0 }}</h2>
+            <h2 class="text-2xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">₹<span data-count-to="{{ total_fuel_cost|floatformat:0 }}">0</span></h2>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+        <div class="w-12 h-12 rounded-xl bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
             <span class="material-symbols-outlined text-[28px]">local_gas_station</span>
         </div>
     </div>
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between card-hover stagger-item">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Maintenance Cost</span>
-            <h2 class="text-2xl font-bold text-error mt-1">₹{{ total_maint_cost|floatformat:0 }}</h2>
+            <h2 class="text-2xl font-bold text-error dark:text-red-300 mt-1">₹<span data-count-to="{{ total_maint_cost|floatformat:0 }}">0</span></h2>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error">
+        <div class="w-12 h-12 rounded-xl bg-error/10 dark:bg-error/20 flex items-center justify-center text-error dark:text-red-300">
             <span class="material-symbols-outlined text-[28px]">build</span>
         </div>
     </div>
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between card-hover stagger-item">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Trips (7 days)</span>
-            <h2 class="text-2xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ trips_this_week }}</h2>
+            <h2 class="text-2xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1"><span data-count-to="{{ trips_this_week }}">0</span></h2>
             <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-1 font-medium">{{ overdue_maintenance }} overdue maint.</p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container">
+        <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 dark:bg-tertiary-container/20 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
             <span class="material-symbols-outlined text-[28px]">calendar_month</span>
         </div>
     </div>
-    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between card-hover stagger-item">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Total Op. Cost</span>
-            <h2 class="text-2xl font-bold text-primary dark:text-primary-fixed-dim mt-1">₹{{ total_operational_cost|floatformat:0 }}</h2>
+            <h2 class="text-2xl font-bold text-primary dark:text-primary-fixed-dim mt-1">₹<span data-count-to="{{ total_operational_cost|floatformat:0 }}">0</span></h2>
             <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-1 font-medium">{{ upcoming_maintenance }} upcoming maint.</p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+        <div class="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
             <span class="material-symbols-outlined text-[28px]">payments</span>
         </div>
     </div>
 </div>
 
 <!-- Charts Grid -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 stagger-group">
     <!-- Vehicle Status & Driver Status -->
-    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in" style="animation-delay: 0.25s;">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in stagger-item" style="animation-delay: 0.25s;">
         <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Vehicle Status Distribution</h3>
         <div class="relative h-[240px] flex items-center justify-center">
             <canvas id="vehicleChart" aria-label="Vehicle status distribution chart" role="img"></canvas>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in" style="animation-delay: 0.3s;">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in stagger-item" style="animation-delay: 0.3s;">
         <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Driver Availability</h3>
         <div class="relative h-[240px] flex items-center justify-center">
             <canvas id="driverChart" aria-label="Driver availability chart" role="img"></canvas>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in" style="animation-delay: 0.35s;">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm animate-fade-in stagger-item" style="animation-delay: 0.35s;">
         <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Trip Management Status</h3>
         <div class="relative h-[240px]">
             <canvas id="tripChart" aria-label="Trip management status chart" role="img"></canvas>
@@ -162,7 +162,7 @@
     </div>
 
     <!-- Fleet Overview Statistics -->
-    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm flex flex-col justify-between animate-fade-in" style="animation-delay: 0.4s;">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm flex flex-col justify-between animate-fade-in stagger-item" style="animation-delay: 0.4s;">
         <div>
             <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Operational Summary</h3>
             <div class="overflow-x-auto">
@@ -195,7 +195,7 @@
                         <tr class="hover:bg-surface-container-low/50 dark:hover:bg-white/5 transition-colors">
                             <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Open Maintenance Logs</td>
                             <td class="py-3 px-2 text-right">
-                                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-error/15 text-error">
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-error/15 dark:bg-error/20 text-error dark:text-red-300">
                                     {{ open_maintenance }}
                                 </span>
                             </td>
@@ -224,7 +224,7 @@
 </div>
 
 <!-- Recent Trips Panel -->
-<div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm mb-6">
+<div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm mb-6 reveal">
     <div class="flex items-center justify-between mb-4">
         <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider">Recent Trips</h3>
         <a href="{% url 'fleet:trip_list' %}" class="text-xs font-semibold text-primary dark:text-primary-fixed-dim hover:underline">View All</a>
@@ -247,7 +247,7 @@
                     <td class="py-2.5 px-3 text-on-surface-variant">{{ t.source }} &rarr; {{ t.destination }}</td>
                     <td class="py-2.5 px-3">
                         {% if t.status == 'Dispatched' %}
-                        <span class="px-2 py-0.5 rounded bg-on-tertiary-container text-tertiary-container font-semibold text-[10px]">Active</span>
+                        <span class="px-2 py-0.5 rounded bg-on-tertiary-container text-tertiary-container font-semibold text-[10px]"><span class="w-1.5 h-1.5 rounded-full bg-current inline-block mr-1 animate-pulse"></span>Active</span>
                         {% elif t.status == 'Completed' %}
                         <span class="px-2 py-0.5 rounded bg-primary/10 text-primary font-semibold text-[10px]">Completed</span>
                         {% else %}

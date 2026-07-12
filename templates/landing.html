@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Enterprise Fleet Management{% endblock %}
+{% block content %}
+<style>
+  .landing-hero { background: linear-gradient(135deg, #1a1a3e 0%, #2d2d6b 50%, #4143d5 100%); }
+  .dark .landing-hero { background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #2d2d6b 100%); }
+  .hero-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; filter: blur(100px); opacity: 0.15; pointer-events: none; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+  .animate-float { animation: float 4s ease-in-out infinite; }
+  .feature-card { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .feature-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(65, 67, 213, 0.15); }
+  .dark .feature-card:hover { box-shadow: 0 12px 40px rgba(65, 67, 213, 0.25); }
+</style>
+
+<div class="-m-4 md:-m-6">
+  <!-- Hero -->
+  <section class="landing-hero relative overflow-hidden px-6 py-20 md:py-32 text-center">
+    <div class="hero-glow bg-primary-fixed-dim" style="top:-200px;left:-200px;"></div>
+    <div class="hero-glow bg-secondary" style="bottom:-200px;right:-200px;"></div>
+    <div class="relative z-10 max-w-4xl mx-auto">
+      <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6 shadow-lg backdrop-blur-sm">
+        <span class="material-symbols-outlined text-white text-3xl">local_shipping</span>
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight mb-4 reveal">
+        Enterprise Fleet<br><span class="text-primary-fixed-dim">Operations Simplified</span>
+      </h1>
+      <p class="text-base md:text-lg text-white/70 max-w-2xl mx-auto mb-8 reveal">
+        Real-time telemetry, driver dispatch, maintenance tracking, and analytics — all in one platform.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 reveal">
+        <a href="{% url 'register' %}" class="px-8 py-3 bg-white text-[#2d2d6b] font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+          Get Started Free
+        </a>
+        <a href="{% url 'login' %}" class="px-8 py-3 bg-white/10 text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+          Sign In
+        </a>
+      </div>
+      <div class="mt-12 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+        <div><div class="text-2xl md:text-4xl font-bold text-primary-fixed-dim" data-count-to="{{ vehicle_count }}">0</div><div class="text-xs text-white/60 mt-1 uppercase tracking-wider">Vehicles</div></div>
+        <div><div class="text-2xl md:text-4xl font-bold text-primary-fixed-dim" data-count-to="{{ driver_count }}">0</div><div class="text-xs text-white/60 mt-1 uppercase tracking-wider">Drivers</div></div>
+        <div><div class="text-2xl md:text-4xl font-bold text-primary-fixed-dim" data-count-to="{{ trip_count }}">0</div><div class="text-xs text-white/60 mt-1 uppercase tracking-wider">Trips</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="py-20 px-6 bg-background dark:bg-[#121218]">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14 reveal">
+        <span class="text-xs font-semibold text-primary uppercase tracking-widest">Platform Capabilities</span>
+        <h2 class="text-3xl md:text-4xl font-bold text-on-surface dark:text-white mt-2">Everything you need to run your fleet</h2>
+        <p class="text-on-surface-variant dark:text-surface-variant mt-3 max-w-xl mx-auto">From dispatch to dollars, TRASITOPS gives you full visibility.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-group">
+        <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-6 feature-card stagger-item">
+          <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+            <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1">radar</span>
+          </div>
+          <h3 class="font-bold text-on-surface dark:text-white mb-2">Real-Time Tracking</h3>
+          <p class="text-sm text-on-surface-variant dark:text-surface-variant leading-relaxed">GPS-enabled live telemetry with speed, fuel, and route monitoring for every vehicle in your fleet.</p>
+        </div>
+        <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-6 feature-card stagger-item">
+          <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container mb-4">
+            <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1">route</span>
+          </div>
+          <h3 class="font-bold text-on-surface dark:text-white mb-2">Smart Dispatch</h3>
+          <p class="text-sm text-on-surface-variant dark:text-surface-variant leading-relaxed">Assign drivers, optimize routes, and track trip progress from draft to completion.</p>
+        </div>
+        <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-6 feature-card stagger-item">
+          <div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error mb-4">
+            <span class="material-symbols-outlined text-2xl">build</span>
+          </div>
+          <h3 class="font-bold text-on-surface dark:text-white mb-2">Maintenance Alerts</h3>
+          <p class="text-sm text-on-surface-variant dark:text-surface-variant leading-relaxed">Automated service reminders, health scoring, and diagnostic tracking for every asset.</p>
+        </div>
+        <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-6 feature-card stagger-item">
+          <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary mb-4">
+            <span class="material-symbols-outlined text-2xl">local_gas_station</span>
+          </div>
+          <h3 class="font-bold text-on-surface dark:text-white mb-2">Fuel Management</h3>
+          <p class="text-sm text-on-surface-variant dark:text-surface-variant leading-relaxed">Log fuel purchases, track consumption per trip, and identify cost-saving opportunities.</p>
+        </div>
+        <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-6 feature-card stagger-item">
+          <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+            <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1">analytics</span>
+          </div>
+          <h3 class="font-bold text-on-surface dark:text-white mb-2">Fleet Analytics</h3>
+          <p class="text-sm text-on-surface-variant dark:text-surface-variant leading-relaxed">KPIs, utilization rates, cost breakdowns, and exportable reports for data-driven decisions.</p>
+        </div>
+        <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-6 feature-card stagger-item">
+          <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary mb-4">
+            <span class="material-symbols-outlined text-2xl">payments</span>
+          </div>
+          <h3 class="font-bold text-on-surface dark:text-white mb-2">Expense Tracking</h3>
+          <p class="text-sm text-on-surface-variant dark:text-surface-variant leading-relaxed">Toll, fuel, maintenance, and operational costs — all in one place with driver attribution.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 px-6 bg-primary/5 dark:bg-white/[0.02] border-t border-outline-variant/20 dark:border-white/5">
+    <div class="max-w-3xl mx-auto text-center reveal">
+      <h2 class="text-3xl md:text-4xl font-bold text-on-surface dark:text-white mb-4">Ready to take control of your fleet?</h2>
+      <p class="text-on-surface-variant dark:text-surface-variant mb-8">Join logistics teams that trust TRANSITOPS to manage their operations.</p>
+      <a href="{% url 'register' %}" class="inline-flex items-center gap-2 px-8 py-3 bg-primary text-white font-bold rounded-xl shadow-lg btn-primary text-base">
+        Create Free Account
+        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 px-6 border-t border-outline-variant/20 dark:border-white/5 bg-surface-container-lowest dark:bg-[#121218]">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-white text-sm">local_shipping</span>
+        </div>
+        <span class="font-bold text-on-surface dark:text-white text-sm">TRANSITOPS</span>
+      </div>
+      <p class="text-xs text-outline">&copy; {% now "Y" %} TransitOps. All rights reserved.</p>
+    </div>
+  </footer>
+</div>
+{% endblock %}
