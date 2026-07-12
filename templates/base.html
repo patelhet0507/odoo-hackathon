@@ -277,9 +277,11 @@
         .spring-enter-active { opacity: 1; transform: scale(1); }
 
         /* === Table Row Indicator (pseudo-element) === */
-        .tr-indicator-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #4143d5; transform: scaleY(0); transition: transform 0.2s ease; border-radius: 0 2px 2px 0; }
-        .tr-indicator-row:hover::before { transform: scaleY(1); }
-        .tr-indicator-row { position: relative; }
+        /* Accent lives on the first cell (not the <tr>) so it never adds a
+           layout box that would shift body columns relative to the header. */
+        .tr-indicator-row > td:first-child { position: relative; }
+        .tr-indicator-row > td:first-child::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #4143d5; transform: scaleY(0); transition: transform 0.2s ease; border-radius: 0 2px 2px 0; }
+        .tr-indicator-row:hover > td:first-child::before { transform: scaleY(1); }
 
         /* === Focus Visible (Accessibility) === */
         *:focus-visible {
