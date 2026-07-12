@@ -181,7 +181,7 @@ class Expense(models.Model):
         ordering = ['-date']
 
     def __str__(self):
-        return f"{self.vehicle.registration_number} - {self.expense_type} - ${self.amount}"
+        return f"{self.vehicle.registration_number} - {self.expense_type} - ₹{self.amount}"
 
 
 class VehicleDocument(models.Model):

@@ -37,7 +37,7 @@
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Operational Cost</span>
-            <h2 class="text-3xl font-bold text-error mt-1">${{ total_op_cost|floatformat:2 }}</h2>
+            <h2 class="text-3xl font-bold text-error mt-1">₹{{ total_op_cost|floatformat:2 }}</h2>
         </div>
         <div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error">
             <span class="material-symbols-outlined text-[28px]">payments</span>
@@ -87,9 +87,9 @@
                     {% for v in vehicle_rois %}
                     <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10 transition-colors">
                         <td class="py-2.5 px-3 font-bold text-on-surface dark:text-white">{{ v.vehicle }}</td>
-                        <td class="py-2.5 px-3 font-semibold text-outline">${{ v.acquisition_cost }}</td>
-                        <td class="py-2.5 px-3 font-semibold text-outline">${{ v.maintenance_cost }}</td>
-                        <td class="py-2.5 px-3 font-semibold text-outline">${{ v.fuel_cost }}</td>
+                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.acquisition_cost }}</td>
+                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.maintenance_cost }}</td>
+                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.fuel_cost }}</td>
                         <td class="py-2.5 px-3 text-right">
                             {% if v.roi >= 0 %}
                                 <span class="px-2 py-0.5 font-bold rounded bg-on-tertiary-container text-tertiary-container">{{ v.roi }}%</span>

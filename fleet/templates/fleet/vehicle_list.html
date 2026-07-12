@@ -102,9 +102,9 @@
                         {% if v.active_driver %}
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-full bg-surface-container-high dark:bg-outline-variant/30 overflow-hidden shrink-0 flex items-center justify-center">
-                                {% if 'Marcus' in v.active_driver.name %}
+                                {% if 'Rajesh' in v.active_driver.name %}
                                     <img alt="Driver" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-b7ovXTJAePpKjW6WE0xk8OFhS31bjnfC2ND7jPrZsDWlIj-p4JKUorvT6OLP_S8RrL80CHmkj562UAPoV2We2Pz64UIX3hu_tLyoctiE8tDsiz21qGLzvemjIP7S1Xh5QuRvJ7jxh1YuwewsOKjrRjOB9iFNZFhEB90Nzrloynl-iXXJuAbFApF45B8q4tV9PO0zFp91hcpg0xNhnIhPF2vIXRdWPi3rZhKvkhiqqZ05apRfrtLNcoeXewMOoof-7jx5s4oheZvk"/>
-                                {% elif 'Sarah' in v.active_driver.name %}
+                                {% elif 'Priya' in v.active_driver.name %}
                                     <img alt="Driver" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIgCTMMlTB9hJp0ocV6yu5HboOQM2Vd6RoA4LE0VA9eoL2fBFcQ3H9pea6Te8Jc_S0rscmsj7utCYJcWUDdYfg4hGoU67pda4aNbZZwqll4BbhmeiaPuk3_1yW0cOH6foMHLc-wVEyYQyfU18NGO29gE_PV_OrpsRsAf5zOIzZMeQTAwpAYGdDYEey1k3zmdGjjkjSp86ImeoJ0JZS2E48qc2bmg9GE8B0TZicxj6jf466C0gDMeMhcAlsEpCQLaw_gi7wp-EyNAGk"/>
                                 {% else %}
                                     <span class="material-symbols-outlined text-outline text-sm">person</span>
@@ -226,7 +226,7 @@
                     </span>
                     <span id="soId" class="font-code-sm text-outline text-xs">ID: V-10492</span>
                 </div>
-                <h2 id="soReg" class="font-headline-lg text-2xl text-on-surface dark:text-white tracking-tight leading-none mb-1">NY-849-TX</h2>
+                <h2 id="soReg" class="font-headline-lg text-2xl text-on-surface dark:text-white tracking-tight leading-none mb-1">MH-12-PQ-3456</h2>
                 <p id="soModel" class="text-sm text-on-surface-variant dark:text-surface-variant">Volvo FH16 • Heavy Duty M2</p>
             </div>
             <button class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-outline-variant/20 text-on-surface-variant dark:text-surface-variant transition-colors" onclick="closeVehicleSlideOver()">
@@ -245,7 +245,7 @@
                             <span class="material-symbols-outlined text-[18px]">speed</span>
                             <span class="text-xs font-semibold">Current Speed</span>
                         </div>
-                        <div id="soSpeed" class="text-2xl font-bold text-on-surface dark:text-white tracking-tight">64 <span class="text-sm text-outline font-medium">mph</span></div>
+                        <div id="soSpeed" class="text-2xl font-bold text-on-surface dark:text-white tracking-tight">64 <span class="text-sm text-outline font-medium">km/h</span></div>
                     </div>
                     
                     <div class="bg-surface/50 dark:bg-outline-variant/5 rounded-xl p-4 border border-outline-variant/20 shadow-sm">
@@ -272,7 +272,7 @@
                                 <img id="soDriverImg" alt="Driver" class="w-full h-full object-cover" src=""/>
                             </div>
                             <div>
-                                <div id="soDriverName" class="text-xs font-semibold text-on-surface dark:text-white">Marcus Johnson</div>
+                                <div id="soDriverName" class="text-xs font-semibold text-on-surface dark:text-white">Rajesh Kumar</div>
                                 <div id="soDriverLic" class="text-[10px] text-outline font-code-sm">CDL-A Verified</div>
                             </div>
                         </div>
@@ -398,7 +398,7 @@
             fuel = 85 + (parseInt(v.id) % 15);
         }
         
-        document.getElementById('soSpeed').innerHTML = speed + ' <span class="text-sm text-outline font-medium">mph</span>';
+        document.getElementById('soSpeed').innerHTML = speed + ' <span class="text-sm text-outline font-medium">km/h</span>';
         document.getElementById('soFuel').innerHTML = fuel + '<span class="text-sm text-outline font-medium">%</span>';
         document.getElementById('soFuelBar').style.width = fuel + '%';
         if (fuel < 30) {
