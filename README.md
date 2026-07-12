@@ -66,3 +66,5 @@ Log in using the seeded administrator credentials:
 * `templates/` - Global HTML base layouts (`base.html`).
 * `static/` - Static CSS and JS assets.
 * `seed_data.py` - Seeding script to initialize local databases.
+
+

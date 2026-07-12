@@ -10,3 +10,5 @@ def cron_check_licenses(request):
     out = StringIO()
     call_command('check_licenses', stdout=out)
     return HttpResponse(out.getvalue())
+
+

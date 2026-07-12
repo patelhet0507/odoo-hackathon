@@ -6,3 +6,5 @@ dj-database-url
 django-storages
 boto3
 xhtml2pdf
+
+

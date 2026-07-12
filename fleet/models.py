@@ -192,3 +192,5 @@ class VehicleDocument(models.Model):
 
     def __str__(self):
         return f"{self.vehicle.registration_number} - {self.document_type}"
+
+

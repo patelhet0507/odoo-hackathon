@@ -34,3 +34,5 @@ class Command(BaseCommand):
             self.stdout.write(f'Alert sent for {d.name} (expired {d.license_expiry_date})')
 
         self.stdout.write(f'Checked {expiring.count()} expiring, {expired.count()} expired.')
+
+

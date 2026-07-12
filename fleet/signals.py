@@ -53,3 +53,5 @@ def handle_maintenance_close(sender, instance, **kwargs):
                 if not has_open:
                     Vehicle.objects.filter(pk=vehicle.pk).update(status=Vehicle.Status.AVAILABLE)
             instance.completed_date = timezone.now().date()
+
+

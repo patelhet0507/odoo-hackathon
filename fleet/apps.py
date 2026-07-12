@@ -7,3 +7,5 @@ class FleetConfig(AppConfig):
 
     def ready(self):
         import fleet.signals
+
+

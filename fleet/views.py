@@ -344,3 +344,5 @@ def vehicle_delete_doc(request, pk, doc_id):
     doc.delete()
     messages.success(request, 'Document deleted.')
     return redirect('fleet:vehicle_detail', pk=pk)
+
+

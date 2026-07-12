@@ -52,3 +52,5 @@ def home(request):
         'vehicle_statuses': Vehicle.Status.choices,
     }
     return render(request, 'dashboard/home.html', context)
+
+

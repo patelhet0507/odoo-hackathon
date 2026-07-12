@@ -15,3 +15,5 @@ document.addEventListener('DOMContentLoaded', function() {
         toggle.innerHTML = next === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-fill"></i>';
     });
 });
+
+

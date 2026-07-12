@@ -8,3 +8,5 @@ admin.site.register(MaintenanceRecord)
 admin.site.register(FuelLog)
 admin.site.register(Expense)
 admin.site.register(VehicleDocument)
+
+

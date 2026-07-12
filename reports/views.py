@@ -129,3 +129,5 @@ def export_pdf(request):
     response['Content-Disposition'] = 'attachment; filename="transitops_report.pdf"'
     pisa.CreatePDF(io.BytesIO(html.encode('UTF-8')), dest=response)
     return response
+
+
