@@ -311,8 +311,8 @@
 <nav id="sidebar" class="fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-surface-container-lowest dark:bg-[#1E1E2F] h-screen w-64 border-r border-outline-variant/30 shadow-sm transition-all duration-300 ease-in-out hidden md:flex" aria-label="Main navigation">
     <!-- Header -->
     <div class="p-6 flex items-center gap-sm">
-        <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0 overflow-hidden">
-            <span class="material-symbols-outlined text-white text-2xl">local_shipping</span>
+        <div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center shrink-0 overflow-hidden p-1">
+            {% include "includes/brand_logo.html" with logo_class="h-8 w-8 object-contain" %}
         </div>
         <div>
             <div class="font-headline-md text-[20px] font-bold text-primary dark:text-primary-fixed leading-tight tracking-tight">TRANSITOPS</div>
@@ -435,7 +435,7 @@
             <button onclick="toggleMobileSidebar()" class="md:hidden p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-outline-variant/20 rounded-full">
                 <span class="material-symbols-outlined">menu</span>
             </button>
-            <div class="font-bold text-lg md:hidden text-primary dark:text-primary-fixed">TRANSITOPS</div>
+            <div class="md:hidden">{% include "includes/brand_logo.html" with logo_class="h-7 w-auto" %}</div>
         </div>
         
         <div class="flex items-center gap-sm">

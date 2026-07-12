@@ -19,8 +19,8 @@
     <div class="hero-glow bg-primary-fixed-dim" style="top:-200px;left:-200px;"></div>
     <div class="hero-glow bg-secondary" style="bottom:-200px;right:-200px;"></div>
     <div class="relative z-10 max-w-4xl mx-auto">
-      <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6 shadow-lg backdrop-blur-sm">
-        <span class="material-symbols-outlined text-white text-3xl">local_shipping</span>
+      <div class="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-6 shadow-lg backdrop-blur-sm p-2">
+        {% include "includes/brand_logo.html" with logo_class="h-12 w-12 object-contain" %}
       </div>
       <h1 class="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight mb-4 reveal">
         Enterprise Fleet<br><span class="text-primary-fixed-dim">Operations Simplified</span>
@@ -115,8 +115,8 @@
   <footer class="py-8 px-6 border-t border-outline-variant/20 dark:border-white/5 bg-surface-container-lowest dark:bg-[#121218]">
     <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-          <span class="material-symbols-outlined text-white text-sm">local_shipping</span>
+        <div class="w-7 h-7 rounded-lg bg-primary flex items-center justify-center p-0.5">
+          {% include "includes/brand_logo.html" with logo_class="h-5 w-5 object-contain" %}
         </div>
         <span class="font-bold text-on-surface dark:text-white text-sm">TRANSITOPS</span>
       </div>
