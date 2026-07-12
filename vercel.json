@@ -1,7 +1,6 @@
 {
-  "framework": null,
   "buildCommand": "python manage.py collectstatic --noinput",
-  "installCommand": "uv pip install --system -r requirements.txt",
+  "installCommand": "pip install --break-system-packages -r requirements.txt",
   "outputDirectory": "staticfiles",
   "functions": {
     "api/index.py": {
