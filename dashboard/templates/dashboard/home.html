@@ -1,6 +1,104 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
+
+{% if is_driver %}
+<!-- Driver Dashboard -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 animate-fade-in">
+    <div>
+        <h1 class="text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">My Dashboard</h1>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Your trips and performance at a glance.</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stagger-group">
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in stagger-item">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Active Trips</span>
+                <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">{{ my_active_trips }}</h2>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">route</span>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in stagger-item" style="animation-delay: 0.1s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Completed</span>
+                <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ my_completed_trips }}</h2>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container">
+                <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in stagger-item" style="animation-delay: 0.15s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Pending</span>
+                <h2 class="text-3xl font-bold text-outline mt-1">{{ my_pending_trips }}</h2>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-outline-variant/20 flex items-center justify-center text-outline">
+                <span class="material-symbols-outlined text-[28px]">pending</span>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl p-5 shadow-sm card-hover animate-fade-in stagger-item" style="animation-delay: 0.2s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Total Trips</span>
+                <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">{{ my_total_trips }}</h2>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined text-[28px]">assignment</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Recent Trips -->
+<div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm mb-6 reveal">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider">My Recent Trips</h3>
+        <a href="{% url 'fleet:trip_list' %}" class="text-xs font-semibold text-primary dark:text-primary-fixed-dim hover:underline">View All</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-outline-variant/20">
+                    <th class="py-2 px-3 text-[10px] font-semibold text-outline uppercase tracking-wider">Vehicle</th>
+                    <th class="py-2 px-3 text-[10px] font-semibold text-outline uppercase tracking-wider">Route</th>
+                    <th class="py-2 px-3 text-[10px] font-semibold text-outline uppercase tracking-wider">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/15 text-xs">
+                {% for t in recent_trips %}
+                <tr class="hover:bg-surface-container-low transition-colors">
+                    <td class="py-2.5 px-3 font-semibold text-on-surface">{{ t.vehicle.registration_number }}</td>
+                    <td class="py-2.5 px-3 text-on-surface-variant">{{ t.source }} &rarr; {{ t.destination }}</td>
+                    <td class="py-2.5 px-3">
+                        {% if t.status == 'Dispatched' %}
+                        <span class="px-2 py-0.5 rounded bg-on-tertiary-container text-tertiary-container font-semibold text-[10px]"><span class="w-1.5 h-1.5 rounded-full bg-current inline-block mr-1 animate-pulse"></span>Active</span>
+                        {% elif t.status == 'Completed' %}
+                        <span class="px-2 py-0.5 rounded bg-primary/10 text-primary font-semibold text-[10px]">Completed</span>
+                        {% else %}
+                        <span class="px-2 py-0.5 rounded bg-outline-variant/30 text-outline font-semibold text-[10px]">{{ t.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="py-6 text-center text-outline text-xs">No trips assigned to you.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+<!-- Standard Dashboard -->
+
 <!-- Header Row -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 animate-fade-in">
     <div>
@@ -262,6 +360,7 @@
         </table>
     </div>
 </div>
+{% endif %}
 
 {% endblock %}
 
@@ -279,6 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const colorOutline = '#767586';
     const colorSecondary = '#645efb';
 
+    {% if not is_driver %}
     new Chart(document.getElementById('vehicleChart'), {
         type: 'doughnut',
         data: {
@@ -350,6 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    {% endif %}
 });
 </script>
 {% endblock %}

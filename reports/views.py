@@ -2,11 +2,12 @@ import os, csv, io
 from datetime import date, timedelta
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import cache_page
 from django.db.models import Sum, Count, Avg, Subquery, OuterRef
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.conf import settings
+from accounts.decorators import role_required
+from accounts.models import User
 from fleet.models import Vehicle, Driver, Trip, FuelLog, MaintenanceRecord, Expense
 
 try:
@@ -17,8 +18,47 @@ except ImportError:
 
 
 @login_required
-@cache_page(120)
+@role_required(User.Role.FLEET_MANAGER, User.Role.FINANCIAL_ANALYST, User.Role.SAFETY_OFFICER)
 def analytics(request):
+    role = request.user.role
+    is_fleet_mgr = role == User.Role.FLEET_MANAGER
+    is_finance = role == User.Role.FINANCIAL_ANALYST
+    is_safety = role == User.Role.SAFETY_OFFICER
+
+    context = {}
+
+    if is_safety:
+        total = Vehicle.objects.count()
+        active_veh = Vehicle.objects.filter(status=Vehicle.Status.ON_TRIP).count()
+        available_veh = Vehicle.objects.filter(status=Vehicle.Status.AVAILABLE).count()
+        in_shop_veh = Vehicle.objects.filter(status=Vehicle.Status.IN_SHOP).count()
+        fleet_util = round((active_veh / total * 100), 1) if total else 0
+
+        total_drivers = Driver.objects.count()
+        expired_licenses = Driver.objects.filter(license_expiry_date__lt=date.today()).count()
+        avg_safety = Driver.objects.aggregate(avg=Avg('safety_score'))['avg'] or 0
+
+        completed = Trip.objects.filter(status=Trip.Status.COMPLETED).count()
+        cancelled = Trip.objects.filter(status=Trip.Status.CANCELLED).count()
+        dispatched = Trip.objects.filter(status=Trip.Status.DISPATCHED).count()
+        total_trips = completed + cancelled + dispatched
+        completion_rate = round((completed / total_trips) * 100, 1) if total_trips else 0
+
+        context = {
+            'is_safety_view': True,
+            'total_vehicles': total, 'active_vehicles': active_veh,
+            'available_vehicles': available_veh, 'in_shop_vehicles': in_shop_veh,
+            'fleet_utilization': fleet_util,
+            'total_drivers': total_drivers, 'expired_licenses': expired_licenses,
+            'avg_safety': round(float(avg_safety), 1),
+            'completed_trips': completed, 'cancelled_trips': cancelled,
+            'dispatched_trips': dispatched, 'total_trips': total_trips,
+            'completion_rate': completion_rate,
+            'type_data': list(Vehicle.objects.values('vehicle_type').annotate(count=Count('id')).order_by('vehicle_type')),
+            'region_data': list(Vehicle.objects.values('region').annotate(count=Count('id')).order_by('region')),
+        }
+        return render(request, 'reports/analytics.html', context)
+
     total = Vehicle.objects.count()
     active_veh = Vehicle.objects.filter(status=Vehicle.Status.ON_TRIP).count()
     available_veh = Vehicle.objects.filter(status=Vehicle.Status.AVAILABLE).count()
@@ -40,7 +80,6 @@ def analytics(request):
     other_cost = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
     total_op_cost = float(fuel_cost) + float(maint_cost) + float(other_cost)
 
-    # ponytail: two dict lookups instead of N aggregate queries per vehicle
     maint_by_vehicle = dict(
         MaintenanceRecord.objects.values_list('vehicle_id')
         .annotate(total=Sum('cost'))
@@ -113,6 +152,7 @@ def analytics(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.FINANCIAL_ANALYST)
 def export_csv(request, model_name):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="{model_name}.csv"'
@@ -126,6 +166,8 @@ def export_csv(request, model_name):
                             v.max_load_capacity, v.odometer, v.acquisition_cost, v.status, v.region])
 
     elif model_name == 'drivers':
+        if request.user.role == User.Role.FINANCIAL_ANALYST:
+            return HttpResponse('Not authorized', status=403)
         writer.writerow(['Name', 'License Number', 'License Category', 'License Expiry',
                          'Contact', 'Safety Score', 'Status'])
         for d in Driver.objects.all():
@@ -133,6 +175,8 @@ def export_csv(request, model_name):
                             d.license_expiry_date, d.contact_number, d.safety_score, d.status])
 
     elif model_name == 'trips':
+        if request.user.role == User.Role.FINANCIAL_ANALYST:
+            return HttpResponse('Not authorized', status=403)
         writer.writerow(['ID', 'Vehicle', 'Driver', 'Source', 'Destination', 'Cargo (kg)',
                          'Distance (km)', 'Status', 'Created'])
         for t in Trip.objects.select_related('vehicle', 'driver').all():
@@ -185,6 +229,7 @@ def export_csv(request, model_name):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.FINANCIAL_ANALYST)
 def export_pdf(request):
     if not HAS_XHTML2PDF:
         return HttpResponse('PDF export requires xhtml2pdf. Install with: pip install xhtml2pdf', status=501)

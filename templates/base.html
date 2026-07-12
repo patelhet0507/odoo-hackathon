@@ -329,65 +329,83 @@
             <span>Dashboard</span>
         </a>
         
-        <!-- Vehicles -->
+        <!-- Vehicles (fleet_manager, safety_officer, financial_analyst) -->
+        {% if can_manage_vehicles %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'vehicle' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:vehicle_list' %}">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'vehicle' in request.path %}1{% else %}0{% endif %};">directions_car</span>
             <span>Vehicles</span>
         </a>
+        {% endif %}
         
-        <!-- Drivers -->
+        <!-- Drivers (fleet_manager, safety_officer) -->
+        {% if can_manage_drivers %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'driver' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:driver_list' %}">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'driver' in request.path %}1{% else %}0{% endif %};">person</span>
             <span>Drivers</span>
         </a>
+        {% endif %}
         
-        <!-- Trips -->
+        <!-- Trips (fleet_manager, driver) -->
+        {% if can_manage_trips %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'trip' in request.path and not 'complete' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:trip_list' %}">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'trip' in request.path and not 'complete' in request.path %}1{% else %}0{% endif %};">route</span>
             <span>Trips</span>
         </a>
+        {% endif %}
         
-        <!-- Dispatch -->
+        <!-- Dispatch (fleet_manager only) -->
+        {% if is_fleet_manager %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'trip/create' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:trip_create' %}">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'trip/create' in request.path %}1{% else %}0{% endif %};">local_shipping</span>
             <span>Dispatch</span>
         </a>
+        {% endif %}
         
-        <!-- Maintenance -->
+        <!-- Maintenance (fleet_manager, safety_officer) -->
+        {% if can_manage_maintenance %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'maintenance' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:maintenance_list' %}">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'maintenance' in request.path %}1{% else %}0{% endif %};">build</span>
             <span>Maintenance</span>
         </a>
+        {% endif %}
         
-        <!-- Fuel -->
+        <!-- Fuel (fleet_manager, financial_analyst) -->
+        {% if can_manage_fuel %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'fuel' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:fuel_list' %}">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'fuel' in request.path %}1{% else %}0{% endif %};">local_gas_station</span>
             <span>Fuel Logs</span>
         </a>
+        {% endif %}
         
-        <!-- Expenses -->
+        <!-- Expenses (fleet_manager, financial_analyst) -->
+        {% if can_manage_expenses %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'expense' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:expense_list' %}">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'expense' in request.path %}1{% else %}0{% endif %};">payments</span>
             <span>Expenses</span>
         </a>
+        {% endif %}
         
         <div class="h-px w-full bg-outline-variant/20 my-3"></div>
         
-        <!-- Reports / Analytics -->
+        <!-- Reports / Analytics (fleet_manager, financial_analyst, safety_officer) -->
+        {% if can_view_reports %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'reports' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'reports:analytics' %}">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'reports' in request.path %}1{% else %}0{% endif %};">analytics</span>
             <span>Analytics</span>
         </a>
+        {% endif %}
     </div>
     {% endwith %}
     
-    <!-- CTA -->
+    <!-- CTA (fleet_manager only) -->
+    {% if is_fleet_manager %}
     <div class="p-3 mt-auto">
         <a href="{% url 'fleet:trip_create' %}" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2 btn-primary" aria-label="Quick Dispatch">
             <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
             Quick Dispatch
         </a>
     </div>
+    {% endif %}
 </nav>
 {% endif %}
 
@@ -406,9 +424,9 @@
         
         <div class="flex items-center gap-sm">
             <!-- Search Input -->
-            <form method="get" action="{% url 'fleet:vehicle_list' %}" class="relative hidden sm:block w-64" role="search">
+            <form method="get" action="{% if is_fleet_manager or is_safety_officer or is_financial_analyst %}{% url 'fleet:vehicle_list' %}{% else %}{% url 'fleet:trip_list' %}{% endif %}" class="relative hidden sm:block w-64" role="search">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">search</span>
-                <input name="q" class="w-full pl-10 pr-4 py-2 bg-surface-container-low dark:bg-white/5 dark:text-white border border-transparent dark:border-white/10 rounded-full focus:ring-2 focus:ring-primary/20 focus:border-primary/30 focus:outline-none text-sm placeholder-outline transition-all" placeholder="Search vehicles, drivers..." type="text" aria-label="Search vehicles, drivers"/>
+                <input name="q" class="w-full pl-10 pr-4 py-2 bg-surface-container-low dark:bg-white/5 dark:text-white border border-transparent dark:border-white/10 rounded-full focus:ring-2 focus:ring-primary/20 focus:border-primary/30 focus:outline-none text-sm placeholder-outline transition-all" placeholder="{% if is_driver %}Search trips...{% else %}Search vehicles, drivers...{% endif %}" type="text" aria-label="Search"/>
             </form>
             
             <div class="h-6 w-px bg-outline-variant/30 mx-2 hidden sm:block"></div>

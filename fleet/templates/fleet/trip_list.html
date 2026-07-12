@@ -8,10 +8,12 @@
         <p class="text-sm text-on-surface-variant dark:text-surface-variant">Dispatch fleets, monitor routes, and log completion of delivery assignments.</p>
     </div>
     
+    {% if is_fleet_manager %}
     <a href="{% url 'fleet:trip_create' %}" class="h-10 px-4 bg-primary text-white rounded-xl font-medium text-sm flex items-center gap-2 btn-primary whitespace-nowrap shrink-0">
         <span class="material-symbols-outlined text-[16px]">add_road</span>
         Create New Trip
     </a>
+    {% endif %}
 </div>
 
 <!-- Search & Filters -->
@@ -97,7 +99,7 @@
                             <a href="{% url 'fleet:trip_detail' t.pk %}" class="p-1.5 text-on-surface-variant hover:text-primary dark:text-surface-variant hover:bg-primary/10 rounded-lg transition-all" title="View details" aria-label="View trip details">
                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
                             </a>
-                            {% if t.status == 'Draft' %}
+                            {% if t.status == 'Draft' and is_fleet_manager %}
                                 <a href="{% url 'fleet:trip_dispatch' t.pk %}" class="px-2.5 py-1 bg-tertiary-container text-on-tertiary-container rounded-lg text-xs font-semibold hover:opacity-90 transition-all flex items-center gap-1" onclick="return confirm('Dispatch this trip?')" aria-label="Dispatch trip">
                                     <span class="material-symbols-outlined text-[14px]">send</span> Dispatch
                                 </a>
@@ -108,9 +110,11 @@
                                 </a>
                             {% endif %}
                             {% if t.status == 'Draft' or t.status == 'Dispatched' %}
+                                {% if is_fleet_manager or is_driver %}
                                 <a href="{% url 'fleet:trip_cancel' t.pk %}" class="p-1.5 text-on-surface-variant hover:text-error dark:text-surface-variant hover:bg-error/10 rounded-lg transition-all" title="Cancel Trip" onclick="return confirm('Cancel this trip?')" aria-label="Cancel trip">
                                     <span class="material-symbols-outlined text-[18px]">cancel</span>
                                 </a>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </td>

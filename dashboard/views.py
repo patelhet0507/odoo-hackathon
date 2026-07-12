@@ -1,14 +1,41 @@
 from datetime import date, timedelta
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import cache_page
 from django.db.models import Sum, Count, Q
+from accounts.models import User
 from fleet.models import Vehicle, Driver, Trip, MaintenanceRecord, FuelLog, Expense
 
 
 @login_required
-@cache_page(60)
 def home(request):
+    role = request.user.role
+    context = {'user_role': role}
+
+    if role == User.Role.DRIVER:
+        driver = getattr(request.user, 'driver_profile', None)
+        if driver:
+            my_trips = Trip.objects.filter(driver=driver)
+            context.update({
+                'my_active_trips': my_trips.filter(status=Trip.Status.DISPATCHED).count(),
+                'my_completed_trips': my_trips.filter(status=Trip.Status.COMPLETED).count(),
+                'my_pending_trips': my_trips.filter(status=Trip.Status.DRAFT).count(),
+                'my_total_trips': my_trips.count(),
+                'recent_trips': my_trips.select_related('vehicle').order_by('-created_at')[:5],
+                'total_vehicles': Vehicle.objects.count(),
+                'total_drivers': Driver.objects.count(),
+                'open_maintenance': MaintenanceRecord.objects.filter(status=MaintenanceRecord.Status.OPEN).count(),
+                'vehicle_types': Vehicle.Type.choices,
+                'vehicle_statuses': Vehicle.Status.choices,
+            })
+        else:
+            context.update({
+                'my_active_trips': 0, 'my_completed_trips': 0,
+                'my_pending_trips': 0, 'my_total_trips': 0,
+                'recent_trips': [], 'total_vehicles': 0, 'total_drivers': 0,
+                'open_maintenance': 0, 'vehicle_types': [], 'vehicle_statuses': [],
+            })
+        return render(request, 'dashboard/home.html', context)
+
     vehicle_stats = Vehicle.objects.aggregate(
         total=Count('id'),
         active=Count('id', filter=Q(status=Vehicle.Status.ON_TRIP)),
@@ -58,18 +85,13 @@ def home(request):
     ).order_by('-created_at')[:5]
 
     region_data = Vehicle.objects.values('region').annotate(count=Count('id')).order_by('-count')
-
     type_data = Vehicle.objects.values('vehicle_type').annotate(count=Count('id')).order_by('-count')
 
     vehicle_type_filter = request.GET.get('type', '')
     status_filter = request.GET.get('status', '')
     region_filter = request.GET.get('region', '')
 
-    vehicle_type_filter = request.GET.get('type', '')
-    status_filter = request.GET.get('status', '')
-    region_filter = request.GET.get('region', '')
-
-    context = {
+    context.update({
         'total_vehicles': total_vehicles,
         'active_vehicles': active_vehicles,
         'available_vehicles': vehicle_stats['available'],
@@ -101,5 +123,5 @@ def home(request):
         'vehicle_type_filter': vehicle_type_filter,
         'status_filter': status_filter,
         'region_filter': region_filter,
-    }
+    })
     return render(request, 'dashboard/home.html', context)

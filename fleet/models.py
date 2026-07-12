@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.conf import settings
 
 
 class Vehicle(models.Model):
@@ -72,6 +73,7 @@ class Driver(models.Model):
         E = 'E', 'E - Heavy Vehicle'
 
     name = models.CharField(max_length=100, db_index=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='driver_profile')
     license_number = models.CharField(max_length=50, unique=True, db_index=True)
     license_category = models.CharField(max_length=10, choices=LicenseCategory.choices, default=LicenseCategory.B)
     license_expiry_date = models.DateField()

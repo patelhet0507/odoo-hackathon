@@ -87,6 +87,14 @@ def seed_data():
     else:
         print('Admin user already exists, skipping')
 
+    for role, username, pw, fn, ln in [
+        (User.Role.SAFETY_OFFICER, 'safety', 'safety123', 'Safety', 'Officer'),
+        (User.Role.FINANCIAL_ANALYST, 'finance', 'finance123', 'Finance', 'Analyst'),
+    ]:
+        if not User.objects.filter(username=username).exists():
+            User.objects.create_user(username=username, email=f'{username}@transitops.com', password=pw, first_name=fn, last_name=ln, role=role, phone='')
+            print(f'Created {fn} {ln} user ({username} / {pw})')
+
     existing_vehicles = {v.registration_number: v for v in Vehicle.objects.all()}
     vehicles = []
     for vd in VEHICLES:
@@ -97,13 +105,37 @@ def seed_data():
         vehicles.append(v)
         print(f'  Created vehicle {vd["reg"]} ({vd["name"]})')
 
+    # Link existing unlinked drivers to their users
+    for i, dd in enumerate(DRIVERS):
+        driver = Driver.objects.filter(license_number=dd['license']).first()
+        if driver and driver.user_id is None:
+            driver_user, _ = User.objects.get_or_create(
+                username=f'driver{i+1}',
+                defaults={'email': f'driver{i+1}@transitops.com', 'role': User.Role.DRIVER, 'first_name': dd['name'].split()[0], 'last_name': dd['name'].split()[-1]},
+            )
+            if not _:
+                driver_user.role = User.Role.DRIVER
+                driver_user.first_name = dd['name'].split()[0]
+                driver_user.last_name = dd['name'].split()[-1]
+                driver_user.save()
+            driver.user = driver_user
+            driver.save()
+            print(f'  Linked driver {dd["name"]} to user {driver_user.username}')
+
     existing_drivers = {d.license_number: d for d in Driver.objects.all()}
     drivers = []
-    for dd in DRIVERS:
+    for i, dd in enumerate(DRIVERS):
         if dd['license'] in existing_drivers:
             drivers.append(existing_drivers[dd['license']])
             continue
-        d = Driver.objects.create(name=dd['name'], license_number=dd['license'], license_category=dd['cat'], license_expiry_date=date.today() + timedelta(days=dd['exp']), contact_number=dd['contact'], safety_score=dd['score'], status=dd['status'])
+        driver_user, _ = User.objects.get_or_create(
+            username=f'driver{i+1}',
+            defaults={'email': f'driver{i+1}@transitops.com', 'role': User.Role.DRIVER, 'first_name': dd['name'].split()[0], 'last_name': dd['name'].split()[-1]},
+        )
+        if not _:
+            driver_user.role = User.Role.DRIVER
+            driver_user.save()
+        d = Driver.objects.create(name=dd['name'], user=driver_user, license_number=dd['license'], license_category=dd['cat'], license_expiry_date=date.today() + timedelta(days=dd['exp']), contact_number=dd['contact'], safety_score=dd['score'], status=dd['status'])
         drivers.append(d)
         print(f'  Created driver {dd["name"]} ({dd["license"]})')
 

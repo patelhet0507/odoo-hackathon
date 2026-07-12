@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Prefetch
-from django.views.decorators.cache import cache_page
+from accounts.decorators import role_required
+from accounts.models import User
 from .models import Vehicle, Driver, Trip, MaintenanceRecord, FuelLog, Expense, VehicleDocument
 from .forms import (VehicleForm, DriverForm, TripForm, TripCompleteForm,
                     MaintenanceForm, FuelLogForm, ExpenseForm)
@@ -30,8 +31,8 @@ def search_queryset(request, queryset, fields):
 # ---- Vehicle Views ----
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.SAFETY_OFFICER, User.Role.FINANCIAL_ANALYST)
 def vehicle_list(request):
-    # ponytail: 2 prefetches replace 9 correlated subqueries (was 9N hits, now ~2)
     qs = Vehicle.objects.prefetch_related(
         Prefetch(
             'trips',
@@ -62,6 +63,7 @@ def vehicle_list(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def vehicle_create(request):
     if request.method == 'POST':
         form = VehicleForm(request.POST)
@@ -75,6 +77,7 @@ def vehicle_create(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def vehicle_update(request, pk):
     vehicle = get_object_or_404(Vehicle, pk=pk)
     if request.method == 'POST':
@@ -89,6 +92,7 @@ def vehicle_update(request, pk):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def vehicle_delete(request, pk):
     vehicle = get_object_or_404(Vehicle, pk=pk)
     if request.method == 'POST':
@@ -99,6 +103,7 @@ def vehicle_delete(request, pk):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.SAFETY_OFFICER, User.Role.FINANCIAL_ANALYST)
 def vehicle_detail(request, pk):
     vehicle = get_object_or_404(Vehicle, pk=pk)
     trips = vehicle.trips.all()[:10]
@@ -108,9 +113,34 @@ def vehicle_detail(request, pk):
     })
 
 
+@login_required
+@role_required(User.Role.FLEET_MANAGER)
+def vehicle_upload_doc(request, pk):
+    vehicle = get_object_or_404(Vehicle, pk=pk)
+    if request.method == 'POST' and request.FILES.get('file'):
+        VehicleDocument.objects.create(
+            vehicle=vehicle,
+            document_type=request.POST.get('document_type', 'Other'),
+            file=request.FILES['file'],
+        )
+        messages.success(request, 'Document uploaded.')
+    return redirect('fleet:vehicle_detail', pk=pk)
+
+
+@login_required
+@role_required(User.Role.FLEET_MANAGER)
+def vehicle_delete_doc(request, pk, doc_id):
+    doc = get_object_or_404(VehicleDocument, pk=doc_id, vehicle_id=pk)
+    doc.file.delete()
+    doc.delete()
+    messages.success(request, 'Document deleted.')
+    return redirect('fleet:vehicle_detail', pk=pk)
+
+
 # ---- Driver Views ----
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.SAFETY_OFFICER)
 def driver_list(request):
     qs = Driver.objects.all()
     qs, query = search_queryset(request, qs, ['name', 'license_number', 'contact_number'])
@@ -126,6 +156,7 @@ def driver_list(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def driver_create(request):
     if request.method == 'POST':
         form = DriverForm(request.POST)
@@ -139,6 +170,7 @@ def driver_create(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def driver_update(request, pk):
     driver = get_object_or_404(Driver, pk=pk)
     if request.method == 'POST':
@@ -153,6 +185,7 @@ def driver_update(request, pk):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def driver_delete(request, pk):
     driver = get_object_or_404(Driver, pk=pk)
     if request.method == 'POST':
@@ -163,6 +196,7 @@ def driver_delete(request, pk):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.SAFETY_OFFICER)
 def driver_detail(request, pk):
     driver = get_object_or_404(Driver, pk=pk)
     trips = driver.trips.all()[:10]
@@ -173,7 +207,10 @@ def driver_detail(request, pk):
 
 @login_required
 def trip_list(request):
-    qs = Trip.objects.select_related('vehicle', 'driver').all()
+    if request.user.role == User.Role.DRIVER and hasattr(request.user, 'driver_profile') and request.user.driver_profile:
+        qs = Trip.objects.select_related('vehicle', 'driver').filter(driver=request.user.driver_profile)
+    else:
+        qs = Trip.objects.select_related('vehicle', 'driver').all()
     qs, query = search_queryset(request, qs, ['source', 'destination'])
     status_filter = request.GET.get('status', '')
     if status_filter:
@@ -187,6 +224,7 @@ def trip_list(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def trip_create(request):
     if request.method == 'POST':
         form = TripForm(request.POST)
@@ -200,6 +238,7 @@ def trip_create(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def trip_dispatch(request, pk):
     trip = get_object_or_404(Trip, pk=pk)
     if trip.status != Trip.Status.DRAFT:
@@ -215,6 +254,10 @@ def trip_dispatch(request, pk):
 @login_required
 def trip_complete(request, pk):
     trip = get_object_or_404(Trip, pk=pk)
+    if request.user.role == User.Role.DRIVER:
+        if not hasattr(request.user, 'driver_profile') or not request.user.driver_profile or trip.driver != request.user.driver_profile:
+            messages.error(request, 'You can only complete your own trips.')
+            return redirect('fleet:trip_list')
     if trip.status != Trip.Status.DISPATCHED:
         messages.error(request, 'Only Dispatched trips can be completed.')
         return redirect('fleet:trip_list')
@@ -232,6 +275,7 @@ def trip_complete(request, pk):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER)
 def trip_cancel(request, pk):
     trip = get_object_or_404(Trip, pk=pk)
     if trip.status not in (Trip.Status.DRAFT, Trip.Status.DISPATCHED):
@@ -246,12 +290,17 @@ def trip_cancel(request, pk):
 @login_required
 def trip_detail(request, pk):
     trip = get_object_or_404(Trip.objects.select_related('vehicle', 'driver'), pk=pk)
+    if request.user.role == User.Role.DRIVER:
+        if not hasattr(request.user, 'driver_profile') or not request.user.driver_profile or trip.driver != request.user.driver_profile:
+            messages.error(request, 'You can only view your own trips.')
+            return redirect('fleet:trip_list')
     return render(request, 'fleet/trip_detail.html', {'trip': trip})
 
 
 # ---- Maintenance Views ----
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.SAFETY_OFFICER)
 def maintenance_list(request):
     qs = MaintenanceRecord.objects.select_related('vehicle').all()
     qs, query = search_queryset(request, qs, ['description', 'maintenance_type', 'vehicle__registration_number'])
@@ -266,6 +315,7 @@ def maintenance_list(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.SAFETY_OFFICER)
 def maintenance_create(request):
     if request.method == 'POST':
         form = MaintenanceForm(request.POST)
@@ -279,6 +329,7 @@ def maintenance_create(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.SAFETY_OFFICER)
 def maintenance_close(request, pk):
     record = get_object_or_404(MaintenanceRecord, pk=pk)
     if record.status != MaintenanceRecord.Status.OPEN:
@@ -293,6 +344,7 @@ def maintenance_close(request, pk):
 # ---- Fuel & Expense Views ----
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.FINANCIAL_ANALYST)
 def fuel_list(request):
     qs = FuelLog.objects.select_related('vehicle').all()
     qs, query = search_queryset(request, qs, ['vehicle__registration_number'])
@@ -303,6 +355,7 @@ def fuel_list(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.FINANCIAL_ANALYST)
 def fuel_create(request):
     if request.method == 'POST':
         form = FuelLogForm(request.POST)
@@ -316,6 +369,7 @@ def fuel_create(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.FINANCIAL_ANALYST)
 def expense_list(request):
     qs = Expense.objects.select_related('vehicle').all()
     qs, query = search_queryset(request, qs, ['vehicle__registration_number', 'expense_type', 'description'])
@@ -326,6 +380,7 @@ def expense_list(request):
 
 
 @login_required
+@role_required(User.Role.FLEET_MANAGER, User.Role.FINANCIAL_ANALYST)
 def expense_create(request):
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
@@ -336,27 +391,3 @@ def expense_create(request):
     else:
         form = ExpenseForm()
     return render(request, 'fleet/expense_form.html', {'form': form, 'title': 'Record Expense'})
-
-
-@login_required
-def vehicle_upload_doc(request, pk):
-    vehicle = get_object_or_404(Vehicle, pk=pk)
-    if request.method == 'POST' and request.FILES.get('file'):
-        VehicleDocument.objects.create(
-            vehicle=vehicle,
-            document_type=request.POST.get('document_type', 'Other'),
-            file=request.FILES['file'],
-        )
-        messages.success(request, 'Document uploaded.')
-    return redirect('fleet:vehicle_detail', pk=pk)
-
-
-@login_required
-def vehicle_delete_doc(request, pk, doc_id):
-    doc = get_object_or_404(VehicleDocument, pk=doc_id, vehicle_id=pk)
-    doc.file.delete()
-    doc.delete()
-    messages.success(request, 'Document deleted.')
-    return redirect('fleet:vehicle_detail', pk=pk)
-
-

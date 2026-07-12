@@ -8,10 +8,12 @@
         <p class="text-sm text-on-surface-variant dark:text-surface-variant">Manage credentials, contact info, safety scores, and duty status of your drivers.</p>
     </div>
     
+    {% if is_fleet_manager %}
     <a href="{% url 'fleet:driver_create' %}" class="h-10 px-4 bg-primary text-white rounded-xl font-medium text-sm flex items-center gap-2 btn-primary whitespace-nowrap shrink-0">
         <span class="material-symbols-outlined text-[16px]">person_add</span>
         Add Driver
     </a>
+    {% endif %}
 </div>
 
 <!-- Search & Filters -->
@@ -118,12 +120,14 @@
                     </td>
                     <td class="py-3.5 px-6 text-right">
                         <div class="flex items-center justify-end gap-2">
+                            {% if is_fleet_manager %}
                             <a href="{% url 'fleet:driver_update' d.pk %}" class="p-1.5 text-on-surface-variant hover:text-primary dark:text-surface-variant hover:bg-primary/10 rounded-lg transition-all" title="Edit Driver" aria-label="Edit driver">
                                 <span class="material-symbols-outlined text-[18px]">edit</span>
                             </a>
                             <a href="{% url 'fleet:driver_delete' d.pk %}" class="p-1.5 text-on-surface-variant hover:text-error dark:text-surface-variant hover:bg-error/10 rounded-lg transition-all" title="Delete Driver" aria-label="Delete driver">
                                 <span class="material-symbols-outlined text-[18px]">delete</span>
                             </a>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
