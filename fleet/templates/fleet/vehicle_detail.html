@@ -17,6 +17,29 @@
                 <a href="{% url 'fleet:vehicle_update' vehicle.pk %}" class="btn btn-primary btn-sm">Edit</a>
             </div>
         </div>
+        <div class="card mb-3">
+            <div class="card-header">Documents</div>
+            <div class="card-body">
+                <form method="post" action="{% url 'fleet:vehicle_upload_doc' vehicle.pk %}" enctype="multipart/form-data" class="mb-2">
+                    {% csrf_token %}
+                    <div class="input-group input-group-sm mb-1">
+                        <input type="text" name="document_type" class="form-control" placeholder="Type (e.g. Insurance)" required>
+                    </div>
+                    <div class="input-group input-group-sm mb-1">
+                        <input type="file" name="file" class="form-control" required>
+                        <button class="btn btn-primary" type="submit">Upload</button>
+                    </div>
+                </form>
+                {% for doc in vehicle.documents.all %}
+                    <p class="mb-1 small">
+                        <a href="{{ doc.file.url }}" target="_blank">{{ doc.document_type }}</a>
+                        <a href="{% url 'fleet:vehicle_delete_doc' vehicle.pk doc.pk %}" class="text-danger" onclick="return confirm('Delete this document?')"><i class="bi bi-x-circle"></i></a>
+                    </p>
+                {% empty %}
+                    <p class="text-muted small">No documents.</p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
     <div class="col-md-4">
         <div class="card mb-3">

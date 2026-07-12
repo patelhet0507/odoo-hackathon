@@ -1,9 +1,17 @@
+import os, csv, io
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import HttpResponse
+from django.template.loader import get_template
+from django.conf import settings
 from fleet.models import Vehicle, Trip, FuelLog, MaintenanceRecord, Expense
-import csv
+
+try:
+    from xhtml2pdf import pisa
+    HAS_XHTML2PDF = True
+except ImportError:
+    HAS_XHTML2PDF = False
 
 
 @login_required
@@ -98,4 +106,26 @@ def export_csv(request, model_name):
         for f in FuelLog.objects.select_related('vehicle').all():
             writer.writerow([f.vehicle.registration_number, f.trip_id, f.liters, f.cost, f.date])
 
+    return response
+
+
+@login_required
+def export_pdf(request):
+    if not HAS_XHTML2PDF:
+        return HttpResponse('PDF export requires xhtml2pdf. Install with: pip install xhtml2pdf', status=501)
+
+    vehicles = Vehicle.objects.all()
+    completed_trips = Trip.objects.filter(status=Trip.Status.COMPLETED).count()
+    total_op_cost = float(FuelLog.objects.aggregate(Sum('cost'))['cost__sum'] or 0) \
+                  + float(MaintenanceRecord.objects.aggregate(Sum('cost'))['cost__sum'] or 0)
+
+    html = get_template('reports/pdf_report.html').render({
+        'vehicles': vehicles,
+        'completed_trips': completed_trips,
+        'total_op_cost': round(total_op_cost, 2),
+        'generated_at': __import__('datetime').datetime.now(),
+    })
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="transitops_report.pdf"'
+    pisa.CreatePDF(io.BytesIO(html.encode('UTF-8')), dest=response)
     return response

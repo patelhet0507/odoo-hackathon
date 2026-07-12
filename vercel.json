@@ -1,0 +1,13 @@
+{
+  "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput",
+  "outputDirectory": "staticfiles",
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.12@3.12",
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index.py" }
+  ]
+}

@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -9,6 +10,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('fleet/', include('fleet.urls')),
     path('reports/', include('reports.urls')),
+    path('cron/check-licenses/', views.cron_check_licenses, name='cron_check_licenses'),
 ]
 
 if settings.DEBUG:

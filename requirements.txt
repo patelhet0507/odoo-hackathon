@@ -1,0 +1,8 @@
+django>=6.0
+psycopg2-binary
+whitenoise
+gunicorn
+dj-database-url
+django-storages
+boto3
+xhtml2pdf

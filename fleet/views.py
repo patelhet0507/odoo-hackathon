@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import Vehicle, Driver, Trip, MaintenanceRecord, FuelLog, Expense
+from .models import Vehicle, Driver, Trip, MaintenanceRecord, FuelLog, Expense, VehicleDocument
 from .forms import (VehicleForm, DriverForm, TripForm, TripCompleteForm,
                     MaintenanceForm, FuelLogForm, ExpenseForm)
 
@@ -322,3 +322,25 @@ def expense_create(request):
     else:
         form = ExpenseForm()
     return render(request, 'fleet/expense_form.html', {'form': form, 'title': 'Record Expense'})
+
+
+@login_required
+def vehicle_upload_doc(request, pk):
+    vehicle = get_object_or_404(Vehicle, pk=pk)
+    if request.method == 'POST' and request.FILES.get('file'):
+        VehicleDocument.objects.create(
+            vehicle=vehicle,
+            document_type=request.POST.get('document_type', 'Other'),
+            file=request.FILES['file'],
+        )
+        messages.success(request, 'Document uploaded.')
+    return redirect('fleet:vehicle_detail', pk=pk)
+
+
+@login_required
+def vehicle_delete_doc(request, pk, doc_id):
+    doc = get_object_or_404(VehicleDocument, pk=doc_id, vehicle_id=pk)
+    doc.file.delete()
+    doc.delete()
+    messages.success(request, 'Document deleted.')
+    return redirect('fleet:vehicle_detail', pk=pk)

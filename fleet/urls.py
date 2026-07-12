@@ -10,6 +10,8 @@ urlpatterns = [
     path('vehicles/<int:pk>/', views.vehicle_detail, name='vehicle_detail'),
     path('vehicles/<int:pk>/update/', views.vehicle_update, name='vehicle_update'),
     path('vehicles/<int:pk>/delete/', views.vehicle_delete, name='vehicle_delete'),
+    path('vehicles/<int:pk>/upload-doc/', views.vehicle_upload_doc, name='vehicle_upload_doc'),
+    path('vehicles/<int:pk>/delete-doc/<int:doc_id>/', views.vehicle_delete_doc, name='vehicle_delete_doc'),
 
     # Drivers
     path('drivers/', views.driver_list, name='driver_list'),
