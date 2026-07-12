@@ -141,7 +141,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Active Vehicles</span>
-                <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1"><span data-count-to="{{ active_vehicles }}">0</span></h2>
+                <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1"><span data-count-to="{{ active_vehicles }}">{{ active_vehicles }}</span></h2>
                 <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ available_vehicles }} available</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
@@ -155,7 +155,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">In Shop</span>
-                <h2 class="text-3xl font-bold text-error dark:text-red-300 mt-1"><span data-count-to="{{ in_shop_vehicles }}">0</span></h2>
+                <h2 class="text-3xl font-bold text-error dark:text-red-300 mt-1"><span data-count-to="{{ in_shop_vehicles }}">{{ in_shop_vehicles }}</span></h2>
                 <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ open_maintenance }} open records</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-error/10 dark:bg-error/20 flex items-center justify-center text-error">
@@ -169,7 +169,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Active Trips</span>
-                <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1"><span data-count-to="{{ active_trips }}">0</span></h2>
+                <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1"><span data-count-to="{{ active_trips }}">{{ active_trips }}</span></h2>
                 <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ pending_trips }} pending draft</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 dark:bg-tertiary-container/20 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
@@ -183,7 +183,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-semibold text-outline tracking-wider uppercase">Fleet Utilization</span>
-                <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1"><span data-count-to="{{ fleet_utilization }}" data-count-suffix="%">0</span></h2>
+                <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1"><span data-count-to="{{ fleet_utilization }}" data-count-suffix="%">{{ fleet_utilization }}</span></h2>
                 <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ total_vehicles }} total vehicles</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
@@ -198,7 +198,7 @@
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between card-hover stagger-item">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Fuel Cost</span>
-            <h2 class="text-2xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">₹<span data-count-to="{{ total_fuel_cost|floatformat:0 }}">0</span></h2>
+            <h2 class="text-2xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">₹<span data-count-to="{{ total_fuel_cost|floatformat:0 }}">{{ total_fuel_cost|floatformat:0 }}</span></h2>
         </div>
         <div class="w-12 h-12 rounded-xl bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
             <span class="material-symbols-outlined text-[28px]">local_gas_station</span>
@@ -207,7 +207,7 @@
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between card-hover stagger-item">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Maintenance Cost</span>
-            <h2 class="text-2xl font-bold text-error dark:text-red-300 mt-1">₹<span data-count-to="{{ total_maint_cost|floatformat:0 }}">0</span></h2>
+            <h2 class="text-2xl font-bold text-error dark:text-red-300 mt-1">₹<span data-count-to="{{ total_maint_cost|floatformat:0 }}">{{ total_maint_cost|floatformat:0 }}</span></h2>
         </div>
         <div class="w-12 h-12 rounded-xl bg-error/10 dark:bg-error/20 flex items-center justify-center text-error dark:text-red-300">
             <span class="material-symbols-outlined text-[28px]">build</span>
@@ -216,7 +216,7 @@
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between card-hover stagger-item">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Trips (7 days)</span>
-            <h2 class="text-2xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1"><span data-count-to="{{ trips_this_week }}">0</span></h2>
+            <h2 class="text-2xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1"><span data-count-to="{{ trips_this_week }}">{{ trips_this_week }}</span></h2>
             <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-1 font-medium">{{ overdue_maintenance }} overdue maint.</p>
         </div>
         <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 dark:bg-tertiary-container/20 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
@@ -226,7 +226,7 @@
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between card-hover stagger-item">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Total Op. Cost</span>
-            <h2 class="text-2xl font-bold text-primary dark:text-primary-fixed-dim mt-1">₹<span data-count-to="{{ total_operational_cost|floatformat:0 }}">0</span></h2>
+            <h2 class="text-2xl font-bold text-primary dark:text-primary-fixed-dim mt-1">₹<span data-count-to="{{ total_operational_cost|floatformat:0 }}">{{ total_operational_cost|floatformat:0 }}</span></h2>
             <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-1 font-medium">{{ upcoming_maintenance }} upcoming maint.</p>
         </div>
         <div class="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
