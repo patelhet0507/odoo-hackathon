@@ -34,6 +34,28 @@ class Vehicle(models.Model):
     def __str__(self):
         return f"{self.registration_number} - {self.name} ({self.status})"
 
+    @property
+    def active_trip(self):
+        return self.trips.filter(status='Dispatched').first()
+
+    @property
+    def active_driver(self):
+        trip = self.active_trip
+        return trip.driver if trip else None
+
+    @property
+    def last_maintenance_record(self):
+        return self.maintenance_records.order_by('-completed_date', '-scheduled_date').first()
+
+    @property
+    def health_score(self):
+        if self.status == self.Status.IN_SHOP:
+            return 58
+        elif self.status == self.Status.ON_TRIP:
+            return 80 + (self.pk % 15)
+        else:
+            return 85 + (self.pk % 10)
+
 
 class Driver(models.Model):
     class Status(models.TextChoices):

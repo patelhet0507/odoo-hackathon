@@ -1,0 +1,43 @@
+<script id="vehicles-json-data" type="application/json">
+{
+    {% for v in vehicles %}
+    "{{ v.pk }}": {
+        "id": "{{ v.pk }}",
+        "registration_number": "{{ v.registration_number|escapejs }}",
+        "name": "{{ v.name|escapejs }}",
+        "model": "{{ v.model|default:v.name|escapejs }}",
+        "type": "{{ v.vehicle_type|escapejs }}",
+        "status": "{{ v.status|escapejs }}",
+        "max_load": "{{ v.max_load_capacity|floatformat:0 }} kg",
+        "odometer": "{{ v.odometer }} km",
+        "region": "{{ v.region|default:'-'|escapejs }}",
+        "health_score": {{ v.health_score }},
+        "edit_url": "{% url 'fleet:vehicle_update' v.pk %}",
+        {% if v.active_trip %}
+        "trip": {
+            "id": "{{ v.active_trip.id }}",
+            "source": "{{ v.active_trip.source|escapejs }}",
+            "destination": "{{ v.active_trip.destination|escapejs }}",
+            "progress_percent": 60,
+            "driver_name": "{{ v.active_driver.name|escapejs }}",
+            "driver_license": "{{ v.active_driver.license_number|escapejs }}",
+            "driver_image": "{% if 'Marcus' in v.active_driver.name %}https://lh3.googleusercontent.com/aida-public/AB6AXuB-b7ovXTJAePpKjW6WE0xk8OFhS31bjnfC2ND7jPrZsDWlIj-p4JKUorvT6OLP_S8RrL80CHmkj562UAPoV2We2Pz64UIX3hu_tLyoctiE8tDsiz21qGLzvemjIP7S1Xh5QuRvJ7jxh1YuwewsOKjrRjOB9iFNZFhEB90Nzrloynl-iXXJuAbFApF45B8q4tV9PO0zFp91hcpg0xNhnIhPF2vIXRdWPi3rZhKvkhiqqZ05apRfrtLNcoeXewMOoof-7jx5s4oheZvk{% elif 'Sarah' in v.active_driver.name %}https://lh3.googleusercontent.com/aida-public/AB6AXuDIgCTMMlTB9hJp0ocV6yu5HboOQM2Vd6RoA4LE0VA9eoL2fBFcQ3H9pea6Te8Jc_S0rscmsj7utCYJcWUDdYfg4hGoU67pda4aNbZZwqll4BbhmeiaPuk3_1yW0cOH6foMHLc-wVEyYQyfU18NGO29gE_PV_OrpsRsAf5zOIzZMeQTAwpAYGdDYEey1k3zmdGjjkjSp86ImeoJ0JZS2E48qc2bmg9GE8B0TZicxj6jf466C0gDMeMhcAlsEpCQLaw_gi7wp-EyNAGk{% else %}null{% endif %}"
+        },
+        {% else %}
+        "trip": null,
+        {% endif %}
+        "last_maintenance": {
+            {% if v.last_maintenance_record %}
+            "description": "{{ v.last_maintenance_record.description|escapejs }}",
+            "date": "{{ v.last_maintenance_record.completed_date|default:v.last_maintenance_record.scheduled_date|date:"Y-m-d" }}",
+            "status": "{{ v.last_maintenance_record.status|escapejs }}"
+            {% else %}
+            "description": "No maintenance history recorded.",
+            "date": "N/A",
+            "status": "Closed"
+            {% endif %}
+        }
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+}
+</script>

@@ -1,65 +1,154 @@
 {% extends 'base.html' %}
-{% block title %}Trips{% endblock %}
+{% block title %}Trip Management{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4><i class="bi bi-map"></i> Trips</h4>
-    <a href="{% url 'fleet:trip_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Create Trip</a>
+<!-- Header & Actions -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+    <div>
+        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Trip Management</h1>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Dispatch fleets, monitor routes, and log completion of delivery assignments.</p>
+    </div>
+    
+    <a href="{% url 'fleet:trip_create' %}" class="h-10 px-4 bg-primary text-on-primary rounded-xl font-medium text-xs flex items-center gap-2 hover:bg-secondary-container transition-colors shadow-sm whitespace-nowrap shrink-0">
+        <span class="material-symbols-outlined text-[16px]">add_road</span>
+        Create New Trip
+    </a>
 </div>
-<div class="card">
-    <div class="card-body">
-        <form method="get" class="row g-2 mb-3">
-            <div class="col-auto"><input type="text" name="q" class="form-control form-control-sm" placeholder="Search source/destination..." value="{{ query }}"></div>
-            <div class="col-auto">
-                <select name="status" class="form-select form-select-sm">
-                    <option value="">All Statuses</option>
-                    {% for s, label in trip_statuses %}
-                        <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-auto"><button class="btn btn-sm btn-outline-primary" type="submit">Filter</button></div>
-        </form>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Vehicle</th>
-                        <th>Driver</th>
-                        <th>Route</th>
-                        <th>Cargo (kg)</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for t in trips %}
-                    <tr>
-                        <td>{{ t.id }}</td>
-                        <td>{{ t.vehicle.registration_number }}</td>
-                        <td>{{ t.driver.name }}</td>
-                        <td>{{ t.source }} → {{ t.destination }}</td>
-                        <td>{{ t.cargo_weight }}</td>
-                        <td><span class="badge bg-{% if t.status == 'Draft' %}secondary{% elif t.status == 'Dispatched' %}primary{% elif t.status == 'Completed' %}success{% else %}danger{% endif %}">{{ t.status }}</span></td>
-                        <td>
-                            <a href="{% url 'fleet:trip_detail' t.pk %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+
+<!-- Search & Filters -->
+<form method="get" class="flex flex-wrap gap-3 mb-4">
+    <div class="relative w-full sm:w-auto">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+        <input type="text" name="q" placeholder="Search source or destination..." value="{{ query }}" class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm placeholder-outline transition-all" style="min-width: 240px;"/>
+    </div>
+    <div class="relative w-full sm:w-auto">
+        <select name="status" onchange="this.form.submit()" class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all">
+            <option value="">All Statuses</option>
+            {% for s, label in trip_statuses %}
+                <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if query or status_filter %}
+        <a href="?" class="px-3 py-2 text-xs font-semibold text-error hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">close</span> Clear filters
+        </a>
+    {% endif %}
+</form>
+
+<!-- Trips Table Card -->
+<div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.01)] border border-outline-variant/30 overflow-hidden relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-outline-variant/20 bg-surface-container-low/30 dark:bg-outline-variant/5">
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider w-16">ID</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Vehicle</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Driver</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Route</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Cargo Weight</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Status</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/15 text-sm">
+                {% for t in trips %}
+                <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10 transition-colors group">
+                    <!-- ID -->
+                    <td class="py-4 px-6 font-code-sm text-xs font-bold text-outline">
+                        TRP-{{ t.id }}
+                    </td>
+                    
+                    <!-- Vehicle -->
+                    <td class="py-4 px-6">
+                        <div class="font-semibold text-on-surface dark:text-white">{{ t.vehicle.registration_number }}</div>
+                        <div class="text-[10px] text-outline mt-0.5">{{ t.vehicle.name }}</div>
+                    </td>
+
+                    <!-- Driver -->
+                    <td class="py-4 px-6">
+                        <div class="font-semibold text-on-surface dark:text-white">{{ t.driver.name }}</div>
+                        <div class="text-[10px] text-outline mt-0.5">{{ t.driver.license_number }}</div>
+                    </td>
+
+                    <!-- Route -->
+                    <td class="py-4 px-6">
+                        <div class="flex items-center gap-1 font-semibold text-on-surface dark:text-white">
+                            <span>{{ t.source }}</span>
+                            <span class="material-symbols-outlined text-[14px] text-outline mx-1">arrow_forward</span>
+                            <span>{{ t.destination }}</span>
+                        </div>
+                        <div class="text-[10px] text-outline mt-0.5">Est. distance: {{ t.planned_distance }} km</div>
+                    </td>
+
+                    <!-- Cargo -->
+                    <td class="py-4 px-6 font-medium text-on-surface dark:text-white">
+                        {{ t.cargo_weight|floatformat:0 }} kg
+                    </td>
+
+                    <!-- Status -->
+                    <td class="py-4 px-6">
+                        {% if t.status == 'Draft' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-outline-variant/30 text-outline text-xs font-medium border border-outline-variant/50">
+                                <span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                Draft
+                            </span>
+                        {% elif t.status == 'Dispatched' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-on-tertiary-container text-tertiary-container text-xs font-medium border border-tertiary-container/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-tertiary-container animate-pulse"></span>
+                                Dispatched
+                            </span>
+                        {% elif t.status == 'Completed' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary dark:text-primary-fixed-dim text-xs font-medium border border-primary/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                Completed
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-medium border border-error-container/50">
+                                <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                Cancelled
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{% url 'fleet:trip_detail' t.pk %}" class="p-1 text-on-surface-variant hover:text-primary dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-outline-variant/20 rounded-lg transition-all" title="View details">
+                                <span class="material-symbols-outlined text-[18px]">visibility</span>
+                            </a>
+                            
                             {% if t.status == 'Draft' %}
-                                <a href="{% url 'fleet:trip_dispatch' t.pk %}" class="btn btn-sm btn-outline-success" onclick="return confirm('Dispatch this trip?')"><i class="bi bi-send"></i> Dispatch</a>
+                                <a href="{% url 'fleet:trip_dispatch' t.pk %}" class="px-2.5 py-1 bg-tertiary-container text-on-tertiary-container rounded-lg text-xs font-semibold hover:bg-opacity-90 transition-all flex items-center gap-1" onclick="return confirm('Dispatch this trip?')">
+                                    <span class="material-symbols-outlined text-[14px]">send</span> Dispatch
+                                </a>
                             {% endif %}
+                            
                             {% if t.status == 'Dispatched' %}
-                                <a href="{% url 'fleet:trip_complete' t.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check-lg"></i> Complete</a>
+                                <a href="{% url 'fleet:trip_complete' t.pk %}" class="px-2.5 py-1 bg-primary text-on-primary rounded-lg text-xs font-semibold hover:bg-secondary transition-all flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">check</span> Complete
+                                </a>
                             {% endif %}
+                            
                             {% if t.status == 'Draft' or t.status == 'Dispatched' %}
-                                <a href="{% url 'fleet:trip_cancel' t.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel this trip?')"><i class="bi bi-x-lg"></i></a>
+                                <a href="{% url 'fleet:trip_cancel' t.pk %}" class="p-1 text-on-surface-variant hover:text-error dark:text-surface-variant hover:bg-error-container/20 rounded-lg transition-all" title="Cancel Trip" onclick="return confirm('Cancel this trip?')">
+                                    <span class="material-symbols-outlined text-[18px]">cancel</span>
+                                </a>
                             {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="7" class="text-center text-muted">No trips found.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="py-8 text-center text-outline">
+                        <span class="material-symbols-outlined text-[36px] opacity-40">map</span>
+                        <p class="mt-2 text-sm">No trips logged.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

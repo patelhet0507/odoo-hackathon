@@ -1,59 +1,161 @@
 {% extends 'base.html' %}
-{% block title %}Drivers{% endblock %}
+{% block title %}Drivers Directory{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4><i class="bi bi-person-badge"></i> Drivers</h4>
-    <a href="{% url 'fleet:driver_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add Driver</a>
+<!-- Header & Actions -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+    <div>
+        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Drivers Directory</h1>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Manage credentials, contact info, safety scores, and duty status of your drivers.</p>
+    </div>
+    
+    <a href="{% url 'fleet:driver_create' %}" class="h-10 px-4 bg-primary text-on-primary rounded-xl font-medium text-xs flex items-center gap-2 hover:bg-secondary-container transition-colors shadow-sm whitespace-nowrap shrink-0">
+        <span class="material-symbols-outlined text-[16px]">person_add</span>
+        Add Driver
+    </a>
 </div>
-<div class="card">
-    <div class="card-body">
-        <form method="get" class="row g-2 mb-3">
-            <div class="col-auto"><input type="text" name="q" class="form-control form-control-sm" placeholder="Search..." value="{{ query }}"></div>
-            <div class="col-auto">
-                <select name="status" class="form-select form-select-sm">
-                    <option value="">All Statuses</option>
-                    {% for s, label in driver_statuses %}
-                        <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-auto"><button class="btn btn-sm btn-outline-primary" type="submit">Filter</button></div>
-        </form>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>License #</th>
-                        <th>Category</th>
-                        <th>License Expiry</th>
-                        <th>Contact</th>
-                        <th>Safety Score</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for d in drivers %}
-                    <tr>
-                        <td><a href="{% url 'fleet:driver_detail' d.pk %}">{{ d.name }}</a></td>
-                        <td>{{ d.license_number }}</td>
-                        <td>{{ d.license_category }}</td>
-                        <td>{{ d.license_expiry_date }}{% if d.license_is_expired %} <span class="badge bg-danger">Expired</span>{% endif %}</td>
-                        <td>{{ d.contact_number }}</td>
-                        <td>{{ d.safety_score }}</td>
-                        <td><span class="badge bg-{% if d.status == 'Available' %}success{% elif d.status == 'On Trip' %}primary{% elif d.status == 'Off Duty' %}secondary{% else %}danger{% endif %}">{{ d.status }}</span></td>
-                        <td>
-                            <a href="{% url 'fleet:driver_update' d.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                            <a href="{% url 'fleet:driver_delete' d.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="8" class="text-center text-muted">No drivers found.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
+<!-- Search & Filters -->
+<form method="get" class="flex flex-wrap gap-3 mb-4">
+    <div class="relative w-full sm:w-auto">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+        <input type="text" name="q" placeholder="Search driver name, license..." value="{{ query }}" class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm placeholder-outline transition-all" style="min-width: 240px;"/>
+    </div>
+    <div class="relative w-full sm:w-auto">
+        <select name="status" onchange="this.form.submit()" class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all">
+            <option value="">All Statuses</option>
+            {% for s, label in driver_statuses %}
+                <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if query or status_filter %}
+        <a href="?" class="px-3 py-2 text-xs font-semibold text-error hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">close</span> Clear filters
+        </a>
+    {% endif %}
+</form>
+
+<!-- Drivers Table Card -->
+<div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.01)] border border-outline-variant/30 overflow-hidden relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-outline-variant/20 bg-surface-container-low/30 dark:bg-outline-variant/5">
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Driver Name</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">License info</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">License Expiry</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Contact Number</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider text-center">Safety Score</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Status</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/15 text-sm">
+                {% for d in drivers %}
+                <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10 transition-colors group">
+                    <!-- Driver Name Column with Icon/Avatar -->
+                    <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-surface-container-high dark:bg-outline-variant/30 overflow-hidden shrink-0 flex items-center justify-center font-bold text-primary dark:text-primary-fixed">
+                                {% if 'Marcus' in d.name %}
+                                    <img alt="Marcus" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-b7ovXTJAePpKjW6WE0xk8OFhS31bjnfC2ND7jPrZsDWlIj-p4JKUorvT6OLP_S8RrL80CHmkj562UAPoV2We2Pz64UIX3hu_tLyoctiE8tDsiz21qGLzvemjIP7S1Xh5QuRvJ7jxh1YuwewsOKjrRjOB9iFNZFhEB90Nzrloynl-iXXJuAbFApF45B8q4tV9PO0zFp91hcpg0xNhnIhPF2vIXRdWPi3rZhKvkhiqqZ05apRfrtLNcoeXewMOoof-7jx5s4oheZvk"/>
+                                {% elif 'Sarah' in d.name %}
+                                    <img alt="Sarah" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIgCTMMlTB9hJp0ocV6yu5HboOQM2Vd6RoA4LE0VA9eoL2fBFcQ3H9pea6Te8Jc_S0rscmsj7utCYJcWUDdYfg4hGoU67pda4aNbZZwqll4BbhmeiaPuk3_1yW0cOH6foMHLc-wVEyYQyfU18NGO29gE_PV_OrpsRsAf5zOIzZMeQTAwpAYGdDYEey1k3zmdGjjkjSp86ImeoJ0JZS2E48qc2bmg9GE8B0TZicxj6jf466C0gDMeMhcAlsEpCQLaw_gi7wp-EyNAGk"/>
+                                {% else %}
+                                    {{ d.name|slice:":2"|upper }}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <a href="{% url 'fleet:driver_detail' d.pk %}" class="font-semibold text-on-surface dark:text-white hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-colors">{{ d.name }}</a>
+                                <div class="text-[10px] text-outline uppercase font-code-sm mt-0.5">DBID-{{ d.id }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- License -->
+                    <td class="py-4 px-6">
+                        <div class="font-semibold text-on-surface dark:text-white">{{ d.license_number }}</div>
+                        <div class="text-[10px] text-outline font-medium uppercase mt-0.5">Category {{ d.license_category }}</div>
+                    </td>
+
+                    <!-- Expiry -->
+                    <td class="py-4 px-6">
+                        <div class="font-medium {% if d.license_is_expired %}text-error{% else %}text-on-surface dark:text-white{% endif %}">
+                            {{ d.license_expiry_date|date:"M d, Y" }}
+                        </div>
+                        <div class="text-[10px] mt-0.5">
+                            {% if d.license_is_expired %}
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-error-container text-on-error-container">Expired</span>
+                            {% else %}
+                                <span class="text-outline">Active</span>
+                            {% endif %}
+                        </div>
+                    </td>
+
+                    <!-- Contact -->
+                    <td class="py-4 px-6 text-on-surface dark:text-white font-medium">
+                        {{ d.contact_number }}
+                    </td>
+
+                    <!-- Safety Score -->
+                    <td class="py-4 px-6">
+                        <div class="flex flex-col items-center">
+                            <span class="text-sm font-bold {% if d.safety_score >= 90 %}text-tertiary-container dark:text-tertiary-fixed-dim{% elif d.safety_score >= 75 %}text-primary dark:text-primary-fixed-dim{% else %}text-error{% endif %}">{{ d.safety_score }}</span>
+                            <div class="w-16 bg-surface-container-high dark:bg-outline-variant/20 h-1 rounded-full mt-1.5 overflow-hidden">
+                                <div class="h-full {% if d.safety_score >= 90 %}bg-tertiary-container{% elif d.safety_score >= 75 %}bg-primary{% else %}bg-error{% endif %}" style="width: {{ d.safety_score }}%"></div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Status -->
+                    <td class="py-4 px-6">
+                        {% if d.status == 'Available' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-outline-variant/30 text-outline text-xs font-medium border border-outline-variant/50">
+                                <span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                Available
+                            </span>
+                        {% elif d.status == 'On Trip' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-on-tertiary-container text-tertiary-container text-xs font-medium border border-tertiary-container/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-tertiary-container animate-pulse"></span>
+                                On Trip
+                            </span>
+                        {% elif d.status == 'Off Duty' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-medium border border-outline-variant/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+                                Off Duty
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-medium border border-error-container/50">
+                                <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                Suspended
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{% url 'fleet:driver_update' d.pk %}" class="p-1.5 text-on-surface-variant hover:text-primary dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-outline-variant/20 rounded-lg transition-all" title="Edit Driver">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                            </a>
+                            <a href="{% url 'fleet:driver_delete' d.pk %}" class="p-1.5 text-on-surface-variant hover:text-error dark:text-surface-variant hover:bg-error-container/20 rounded-lg transition-all" title="Delete Driver">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="py-8 text-center text-outline">
+                        <span class="material-symbols-outlined text-[36px] opacity-40">person_search</span>
+                        <p class="mt-2 text-sm">No drivers found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

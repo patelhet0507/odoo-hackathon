@@ -1,74 +1,535 @@
 {% extends 'base.html' %}
-{% block title %}Vehicles{% endblock %}
+{% block title %}Fleet Vehicles{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4><i class="bi bi-truck"></i> Vehicles</h4>
-    <a href="{% url 'fleet:vehicle_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add Vehicle</a>
-</div>
-<div class="card">
-    <div class="card-body">
-        <form method="get" class="row g-2 mb-3">
-            <div class="col-auto"><input type="text" name="q" class="form-control form-control-sm" placeholder="Search..." value="{{ query }}"></div>
-            <div class="col-auto">
-                <select name="type" class="form-select form-select-sm">
-                    <option value="">All Types</option>
-                    {% for t, label in vehicle_types %}
-                        <option value="{{ t }}" {% if type_filter == t %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-auto">
-                <select name="status" class="form-select form-select-sm">
-                    <option value="">All Statuses</option>
-                    {% for s, label in vehicle_statuses %}
-                        <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-auto"><button class="btn btn-sm btn-outline-primary" type="submit">Filter</button></div>
-        </form>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead>
-                    <tr>
-                        <th>Reg #</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Max Load (kg)</th>
-                        <th>Odometer (km)</th>
-                        <th>Status</th>
-                        <th>Region</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for v in vehicles %}
-                    <tr>
-                        <td><a href="{% url 'fleet:vehicle_detail' v.pk %}">{{ v.registration_number }}</a></td>
-                        <td>{{ v.name }}</td>
-                        <td>{{ v.vehicle_type }}</td>
-                        <td>{{ v.max_load_capacity }}</td>
-                        <td>{{ v.odometer }}</td>
-                        <td><span class="badge bg-{% if v.status == 'Available' %}success{% elif v.status == 'On Trip' %}primary{% elif v.status == 'In Shop' %}warning{% else %}secondary{% endif %}">{{ v.status }}</span></td>
-                        <td>{{ v.region|default:'-' }}</td>
-                        <td>
-                            <a href="{% url 'fleet:vehicle_update' v.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                            <a href="{% url 'fleet:vehicle_delete' v.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="8" class="text-center text-muted">No vehicles found.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<!-- Header & Actions -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+    <div>
+        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Fleet Overview</h1>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Manage and monitor active vehicles across all logistics regions.</p>
+    </div>
+    
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+        <!-- Status filter pill buttons -->
+        <div class="flex bg-surface-container-lowest dark:bg-outline-variant/10 border border-outline-variant/30 rounded-xl p-1 shadow-sm h-10 w-full sm:w-auto overflow-x-auto no-scrollbar">
+            <a href="?status={% if query %}&q={{ query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-1.5 {% if not status_filter %}bg-surface-container-low dark:bg-outline-variant/30 text-on-surface dark:text-white{% else %}text-on-surface-variant hover:text-on-surface dark:text-surface-variant dark:hover:text-white{% endif %} rounded-lg font-medium text-xs whitespace-nowrap transition-all">All</a>
+            <a href="?status=On Trip{% if query %}&q={{ query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-1.5 {% if status_filter == 'On Trip' %}bg-surface-container-low dark:bg-outline-variant/30 text-on-surface dark:text-white{% else %}text-on-surface-variant hover:text-on-surface dark:text-surface-variant dark:hover:text-white{% endif %} rounded-lg font-medium text-xs whitespace-nowrap transition-all">Active</a>
+            <a href="?status=In Shop{% if query %}&q={{ query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-1.5 {% if status_filter == 'In Shop' %}bg-surface-container-low dark:bg-outline-variant/30 text-on-surface dark:text-white{% else %}text-on-surface-variant hover:text-on-surface dark:text-surface-variant dark:hover:text-white{% endif %} rounded-lg font-medium text-xs whitespace-nowrap transition-all">Maintenance</a>
+            <a href="?status=Available{% if query %}&q={{ query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-1.5 {% if status_filter == 'Available' %}bg-surface-container-low dark:bg-outline-variant/30 text-on-surface dark:text-white{% else %}text-on-surface-variant hover:text-on-surface dark:text-surface-variant dark:hover:text-white{% endif %} rounded-lg font-medium text-xs whitespace-nowrap transition-all">Idle</a>
         </div>
-        {% if pages > 1 %}
-        <nav><ul class="pagination pagination-sm">
-            {% for p in page_range %}
-                <li class="page-item {% if p == page %}active{% endif %}"><a class="page-link" href="?page={{ p }}{% if query %}&q={{ query }}{% endif %}">{{ p }}</a></li>
-            {% endfor %}
-        </ul></nav>
-        {% endif %}
+        
+        <a href="{% url 'fleet:vehicle_create' %}" class="h-10 px-4 bg-primary text-on-primary rounded-xl font-medium text-xs flex items-center gap-2 hover:bg-secondary-container transition-colors shadow-sm whitespace-nowrap shrink-0">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            Add Vehicle
+        </a>
     </div>
 </div>
+
+<!-- Search and secondary filters form -->
+<form method="get" class="flex flex-wrap gap-3 mb-4">
+    <input type="hidden" name="status" value="{{ status_filter }}"/>
+    <div class="relative w-full sm:w-auto">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+        <input type="text" name="q" placeholder="Search registration, model..." value="{{ query }}" class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm placeholder-outline transition-all" style="min-width: 240px;"/>
+    </div>
+    <div class="relative w-full sm:w-auto">
+        <select name="type" onchange="this.form.submit()" class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all">
+            <option value="">All Types</option>
+            {% for t, label in vehicle_types %}
+                <option value="{{ t }}" {% if type_filter == t %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if query or type_filter %}
+        <a href="?status={{ status_filter }}" class="px-3 py-2 text-xs font-semibold text-error hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">close</span> Clear filters
+        </a>
+    {% endif %}
+</form>
+
+<!-- Main Table Card -->
+<div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.01)] border border-outline-variant/30 overflow-hidden relative">
+    <!-- Animated Top Border for Live Data Feel -->
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-tertiary-fixed-dim opacity-70"></div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-outline-variant/20 bg-surface-container-low/30 dark:bg-outline-variant/5">
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider w-16">Image</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Registration &amp; Model</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Driver &amp; Trip</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider hidden md:table-cell">Last Maintenance</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider text-center">Health</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider text-right">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/15 text-sm">
+                {% for v in vehicles %}
+                <!-- Row -->
+                <tr class="table-row-hover hover:bg-surface-container-low dark:hover:bg-outline-variant/10 transition-colors group" onclick="openVehicleSlideOver('{{ v.pk }}')">
+                    <!-- Image Column -->
+                    <td class="py-4 px-6">
+                        <div class="w-12 h-10 rounded bg-surface-container-low dark:bg-outline-variant/20 overflow-hidden border border-outline-variant/20 flex items-center justify-center shrink-0">
+                            {% if v.vehicle_type == 'Truck' %}
+                                <!-- Isometric Truck Mockup or fallback -->
+                                {% if 'Volvo' in v.name %}
+                                    <img alt="Truck" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpCYTRRVibPxctlhopXW3YSTU6KiZpgb_xumCFHXeOwW7X1DvBm7ut4WpyR4eEFiPmDwRJeD3IjjM_jbCUmIFGrbAppXrS9VYDZ3ET-y9t3B5n85tWR-zSPShMZYHVw10pYFDWVzTxUfV9EKJYao78rM7WJ0c480x5jmT6AEjqVoyWUGUBz1FetSkjS2zgaV4tli5DvRth5x47akvL-giF-66jKOqbxMKRZYic2WMquH9dnmgPkPISuef_UAaBQ3C-Temvx48dyN9b"/>
+                                {% elif 'Peterbilt' in v.name %}
+                                    <img alt="Truck" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcQbSYtif27ywT1j6c4GpDrSAH5-xsZkCE08QIBlFQEbOTQ19TvkgvFYCrfuZCkfs3_3jC862usssKPRO-XdVcE94XUHMpacOTWirKzdXBvAw7bQDmKhsQ6-th7CvpcVVLhNYpyEmoSvTvbGW1FQZQpPHSkKljRqjHFe9bs5iAMQQc6zsKNsr9RIhS4xEHdDZSSsbVHTA-uZ6PXqjUADpnb4Fli2BwvyhEvcbmFDCuQbY3DsgKosHzUt454HRlAISJjnAh7dSFtD-_"/>
+                                {% else %}
+                                    <img alt="Truck" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfn-vTL0wh--ir4EAYfV_CcXZMdzmVEM5WQMR0Y4gwIfXWgYpCWimuxAww2PYmBUjRfylwHkicxBILPOtc4kiLTzy8WbcBOBfpWaK4RKDwX8dHHkuwbVYn_Y4ReYzhqH855LtxpE8inrhFP5anRMCNy5xX3Mb4g_pIbP3pW--MCE-ykIBF-ChBdnIOjmbxk0tZZl3A26b7vXrUVFjgJ8eCRGyCxuaznYVHMfIBTO_LSbqhV0oAeBCLoW5m6nGYt-A4CEeAXft_KxXR"/>
+                                {% endif %}
+                            {% elif v.vehicle_type == 'Van' %}
+                                <img alt="Van" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKl7x1et9QaQIn9MnXo-PFwgKFNcDXYL9_pKoQM3glajIV3_V4BkVupaL8eSTLIpwvw8hGcygHi8WaU95gl3G-22q5zp2ISNmxtId_ruzOqqbQ4NikFJsqBYfM9fNAfVMaJxNuXjA-Bfg7py3dGehQ1nxe5OP4KQT8tHWgs5JgG10BX9wda6CUlrY41sTVfFWknoPTNfOtDVGNxB1BMO5ARBSiDRZNTQMNcoA9r_qCosuOHDCZazJb2GaY0fX9Ps5V7aBRvFLKdjp0"/>
+                            {% else %}
+                                <span class="material-symbols-outlined text-outline text-xl">directions_car</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    
+                    <!-- Reg & Model -->
+                    <td class="py-4 px-6">
+                        <div class="font-semibold text-on-surface dark:text-white group-hover:text-primary transition-colors">{{ v.registration_number }}</div>
+                        <div class="text-xs text-on-surface-variant dark:text-surface-variant flex items-center gap-1.5 mt-0.5">
+                            <span>{{ v.name }}</span>
+                            <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+                            <span>{{ v.max_load_capacity|floatformat:0 }}kg</span>
+                        </div>
+                    </td>
+
+                    <!-- Driver & Trip -->
+                    <td class="py-4 px-6">
+                        {% if v.active_driver %}
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-surface-container-high dark:bg-outline-variant/30 overflow-hidden shrink-0 flex items-center justify-center">
+                                {% if 'Marcus' in v.active_driver.name %}
+                                    <img alt="Driver" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-b7ovXTJAePpKjW6WE0xk8OFhS31bjnfC2ND7jPrZsDWlIj-p4JKUorvT6OLP_S8RrL80CHmkj562UAPoV2We2Pz64UIX3hu_tLyoctiE8tDsiz21qGLzvemjIP7S1Xh5QuRvJ7jxh1YuwewsOKjrRjOB9iFNZFhEB90Nzrloynl-iXXJuAbFApF45B8q4tV9PO0zFp91hcpg0xNhnIhPF2vIXRdWPi3rZhKvkhiqqZ05apRfrtLNcoeXewMOoof-7jx5s4oheZvk"/>
+                                {% elif 'Sarah' in v.active_driver.name %}
+                                    <img alt="Driver" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIgCTMMlTB9hJp0ocV6yu5HboOQM2Vd6RoA4LE0VA9eoL2fBFcQ3H9pea6Te8Jc_S0rscmsj7utCYJcWUDdYfg4hGoU67pda4aNbZZwqll4BbhmeiaPuk3_1yW0cOH6foMHLc-wVEyYQyfU18NGO29gE_PV_OrpsRsAf5zOIzZMeQTAwpAYGdDYEey1k3zmdGjjkjSp86ImeoJ0JZS2E48qc2bmg9GE8B0TZicxj6jf466C0gDMeMhcAlsEpCQLaw_gi7wp-EyNAGk"/>
+                                {% else %}
+                                    <span class="material-symbols-outlined text-outline text-sm">person</span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="text-xs font-semibold text-on-surface dark:text-white">{{ v.active_driver.name }}</div>
+                                <div class="text-[10px] text-outline font-code-sm uppercase mt-0.5">TRP-{{ v.active_trip.id }}</div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full border border-outline-variant/30 flex items-center justify-center text-outline-variant shrink-0">
+                                <span class="material-symbols-outlined text-[18px]">person_off</span>
+                            </div>
+                            <div>
+                                <div class="text-xs font-medium text-outline">Unassigned</div>
+                                <div class="text-[10px] text-on-surface-variant/50">--</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </td>
+
+                    <!-- Last Maintenance -->
+                    <td class="py-4 px-6 hidden md:table-cell">
+                        {% if v.last_maintenance_record %}
+                            <div class="text-xs font-medium text-on-surface dark:text-white">{{ v.last_maintenance_record.completed_date|default:v.last_maintenance_record.scheduled_date|date:"M d, Y" }}</div>
+                            <div class="text-[10px] text-outline mt-0.5">
+                                {% if v.last_maintenance_record.status == 'Open' %}
+                                    <span class="text-error font-semibold">Scheduled today</span>
+                                {% else %}
+                                    Serviced
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="text-xs font-medium text-outline">No logs</div>
+                            <div class="text-[10px] text-on-surface-variant/40">--</div>
+                        {% endif %}
+                    </td>
+
+                    <!-- Health Progress -->
+                    <td class="py-4 px-6">
+                        <div class="flex justify-center items-center">
+                            <div class="radial-progress w-9 h-9">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <circle class="bg-circle" cx="18" cy="18" r="14"></circle>
+                                    <circle class="progress-circle {% if v.status == 'In Shop' %}stroke-error{% elif v.status == 'On Trip' %}stroke-tertiary-container{% else %}stroke-primary{% endif %}" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="{% widthratio v.health_score 100 88 %}" style="stroke-dashoffset: calc(88 - (88 * {{ v.health_score }}) / 100);"></circle>
+                                </svg>
+                                <span class="absolute text-[9px] font-bold {% if v.status == 'In Shop' %}text-error{% elif v.status == 'On Trip' %}text-tertiary-container{% else %}text-primary{% endif %}">{{ v.health_score }}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Status Badge -->
+                    <td class="py-4 px-6 text-right">
+                        {% if v.status == 'Available' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-outline-variant/30 text-outline text-xs font-medium border border-outline-variant/50">
+                                <span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                Idle
+                            </span>
+                        {% elif v.status == 'On Trip' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-on-tertiary-container text-tertiary-container text-xs font-medium border border-tertiary-container/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-tertiary-container animate-pulse"></span>
+                                Active
+                            </span>
+                        {% elif v.status == 'In Shop' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-medium border border-error-container/50">
+                                <span class="material-symbols-outlined text-[10px]">build</span>
+                                In Shop
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-medium border border-outline-variant/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+                                Retired
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="py-8 text-center text-outline">
+                        <span class="material-symbols-outlined text-[36px] opacity-40">search_off</span>
+                        <p class="mt-2 text-sm">No vehicles found. Try broadening your query.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    {% if pages > 1 %}
+    <div class="p-4 border-t border-outline-variant/20 bg-surface-container-low/20 dark:bg-outline-variant/5 flex items-center justify-between">
+        <span class="text-xs text-on-surface-variant dark:text-surface-variant">Showing page {{ page }} of {{ pages }}</span>
+        <div class="flex gap-1">
+            {% for p in page_range %}
+            <a href="?page={{ p }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors {% if p == page %}bg-primary text-on-primary{% else %}text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-outline-variant/20{% endif %}">
+                {{ p }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Slide-over Panel (Vehicle Details Drawer) -->
+<div id="slideOver" class="fixed inset-0 z-50 pointer-events-none" style="display: none;">
+    <!-- Backdrop -->
+    <div id="slideOverBackdrop" class="absolute inset-0 bg-on-background/25 dark:bg-black/40 backdrop-blur-sm pointer-events-auto opacity-0 transition-opacity duration-300" onclick="closeVehicleSlideOver()"></div>
+    
+    <!-- Panel body -->
+    <div id="slideOverPanel" class="absolute right-0 top-0 bottom-0 w-full md:w-[480px] bg-surface-container-lowest/95 dark:bg-on-background/95 backdrop-blur-md border-l border-outline-variant/30 shadow-2xl flex flex-col pointer-events-auto transform translate-x-full transition-transform duration-300">
+        <!-- Panel Header -->
+        <div class="p-6 border-b border-outline-variant/20 flex justify-between items-start">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span id="soBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                        Active
+                    </span>
+                    <span id="soId" class="font-code-sm text-outline text-xs">ID: V-10492</span>
+                </div>
+                <h2 id="soReg" class="font-headline-lg text-2xl text-on-surface dark:text-white tracking-tight leading-none mb-1">NY-849-TX</h2>
+                <p id="soModel" class="text-sm text-on-surface-variant dark:text-surface-variant">Volvo FH16 • Heavy Duty M2</p>
+            </div>
+            <button class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-outline-variant/20 text-on-surface-variant dark:text-surface-variant transition-colors" onclick="closeVehicleSlideOver()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Telemetry Cards -->
+            <div>
+                <h3 class="font-semibold text-[11px] text-outline uppercase tracking-wider mb-3">Live Telemetry</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-surface/50 dark:bg-outline-variant/5 rounded-xl p-4 border border-outline-variant/20 shadow-sm">
+                        <div class="flex items-center gap-1.5 text-on-surface-variant dark:text-surface-variant mb-1.5">
+                            <span class="material-symbols-outlined text-[18px]">speed</span>
+                            <span class="text-xs font-semibold">Current Speed</span>
+                        </div>
+                        <div id="soSpeed" class="text-2xl font-bold text-on-surface dark:text-white tracking-tight">64 <span class="text-sm text-outline font-medium">mph</span></div>
+                    </div>
+                    
+                    <div class="bg-surface/50 dark:bg-outline-variant/5 rounded-xl p-4 border border-outline-variant/20 shadow-sm">
+                        <div class="flex items-center gap-1.5 text-on-surface-variant dark:text-surface-variant mb-1.5">
+                            <span class="material-symbols-outlined text-[18px]">local_gas_station</span>
+                            <span class="text-xs font-semibold">Fuel Level</span>
+                        </div>
+                        <div id="soFuel" class="text-2xl font-bold text-on-surface dark:text-white tracking-tight">42<span class="text-sm text-outline font-medium">%</span></div>
+                        <div class="w-full bg-surface-container-high dark:bg-outline-variant/20 h-1.5 rounded-full mt-2 overflow-hidden">
+                            <div id="soFuelBar" class="bg-secondary h-full rounded-full" style="width: 42%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Current Assignment -->
+            <div id="soAssignmentSection">
+                <h3 class="font-semibold text-[11px] text-outline uppercase tracking-wider mb-3">Current Assignment</h3>
+                <div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+                    <!-- Driver Info Header -->
+                    <div class="p-4 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-low/20 dark:bg-outline-variant/5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-surface-container-high dark:bg-outline-variant/30 overflow-hidden shrink-0 flex items-center justify-center">
+                                <img id="soDriverImg" alt="Driver" class="w-full h-full object-cover" src=""/>
+                            </div>
+                            <div>
+                                <div id="soDriverName" class="text-xs font-semibold text-on-surface dark:text-white">Marcus Johnson</div>
+                                <div id="soDriverLic" class="text-[10px] text-outline font-code-sm">CDL-A Verified</div>
+                            </div>
+                        </div>
+                        <button class="text-primary dark:text-primary-fixed-dim text-xs font-semibold hover:underline">Message</button>
+                    </div>
+                    
+                    <!-- Route progress -->
+                    <div class="p-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span id="soTripId" class="text-[10px] text-outline font-code-sm">TRP-9021</span>
+                            <span class="text-[10px] font-semibold text-tertiary-container dark:text-tertiary-fixed-dim">On Schedule</span>
+                        </div>
+                        <div id="soRoute" class="text-xs font-semibold text-on-surface dark:text-white mb-4">Chicago, IL → Dallas, TX</div>
+                        
+                        <!-- Mini Route Progress Line -->
+                        <div class="relative pt-2 pb-6">
+                            <div class="absolute top-3.5 left-2 right-2 h-0.5 bg-surface-container-high dark:bg-outline-variant/30"></div>
+                            <div class="absolute top-3.5 left-2 h-0.5 bg-primary z-10" style="width: 60%;"></div>
+                            <div class="flex justify-between relative z-20">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-3.5 h-3.5 rounded-full bg-primary border-2 border-surface-container-lowest dark:border-on-background shadow-sm mb-1"></div>
+                                    <span class="text-[9px] text-outline absolute top-4 whitespace-nowrap">Source</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-3.5 h-3.5 rounded-full bg-surface-container-lowest dark:bg-on-background border-2 border-primary shadow-sm mb-1"></div>
+                                    <span class="text-[9px] text-primary dark:text-primary-fixed-dim absolute top-4 whitespace-nowrap font-medium">In Transit</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-3.5 h-3.5 rounded-full bg-surface-container-high dark:bg-outline-variant/30 border-2 border-surface-container-lowest dark:border-on-background shadow-sm mb-1"></div>
+                                    <span class="text-[9px] text-outline absolute top-4 whitespace-nowrap">Dest.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Maintenance Health status -->
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-semibold text-[11px] text-outline uppercase tracking-wider">Maintenance Health</h3>
+                    <a href="{% url 'fleet:maintenance_list' %}" class="text-[10px] font-semibold text-primary dark:text-primary-fixed-dim hover:underline">View Log</a>
+                </div>
+                
+                <div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-xl border border-outline-variant/30 shadow-sm p-4">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="radial-progress w-14 h-14 shrink-0">
+                            <svg class="w-full h-full" viewBox="0 0 36 36">
+                                <circle class="bg-circle" cx="18" cy="18" r="14" stroke-width="3"></circle>
+                                <circle id="soHealthProgressCircle" class="progress-circle stroke-tertiary-container" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="6" stroke-width="3"></circle>
+                            </svg>
+                            <span id="soHealthScoreText" class="absolute text-sm font-bold text-tertiary-container">94</span>
+                        </div>
+                        <div>
+                            <div id="soHealthHeadline" class="text-xs font-semibold text-on-surface dark:text-white">Excellent Condition</div>
+                            <div id="soHealthSub" class="text-[11px] text-on-surface-variant dark:text-surface-variant leading-relaxed">Last serviced 45 days ago. Diagnostics report all green.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2.5 pt-3 border-t border-outline-variant/20">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-outline flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span> Engine Diagnostics</span>
+                            <span id="diagEngine" class="font-semibold text-on-surface dark:text-white">Pass</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-outline flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span> Brake Systems</span>
+                            <span id="diagBrake" class="font-semibold text-on-surface dark:text-white">Pass</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-outline flex items-center gap-1.5"><span id="diagTireBullet" class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Tire Tread</span>
+                            <span id="diagTire" class="font-semibold text-on-surface dark:text-white">Monitor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel Footer -->
+        <div class="p-4 border-t border-outline-variant/20 bg-surface-container-low/40 dark:bg-outline-variant/5 backdrop-blur-md flex gap-3">
+            <a id="soReportBtn" href="#" class="flex-1 py-2.5 px-4 rounded-xl border border-outline-variant/40 text-on-surface dark:text-white font-semibold text-xs text-center hover:bg-surface-container-low dark:hover:bg-outline-variant/20 transition-colors">Generate Report</a>
+            <a id="soEditBtn" href="#" class="flex-1 py-2.5 px-4 rounded-xl bg-primary text-on-primary font-semibold text-xs text-center hover:bg-secondary-container dark:hover:bg-primary-container shadow-sm transition-colors">Edit Vehicle</a>
+        </div>
+    </div>
+</div>
+
+<!-- Populate vehicle data JSON block -->
+{% include "fleet/vehicle_data.html" %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let activeVehicleId = null;
+
+    function openVehicleSlideOver(vehicleId) {
+        const vehiclesData = JSON.parse(document.getElementById('vehicles-json-data').textContent);
+        const v = vehiclesData[vehicleId];
+        if (!v) return;
+        
+        activeVehicleId = vehicleId;
+        
+        // Populate static attributes
+        document.getElementById('soId').textContent = 'ID: V-' + v.id;
+        document.getElementById('soReg').textContent = v.registration_number;
+        document.getElementById('soModel').textContent = v.name + ' • ' + v.model;
+        
+        // Set up report buttons urls
+        document.getElementById('soEditBtn').href = v.edit_url;
+        document.getElementById('soReportBtn').href = `/reports/export/vehicle/?v=${v.id}`;
+        
+        // Telemetry mock details
+        let speed = 0;
+        let fuel = 100;
+        
+        if (v.status === 'On Trip') {
+            speed = 50 + (parseInt(v.id) % 15);
+            fuel = 40 + (parseInt(v.id) % 45);
+        } else if (v.status === 'In Shop') {
+            speed = 0;
+            fuel = 20 + (parseInt(v.id) % 20);
+        } else { // Available / Idle
+            speed = 0;
+            fuel = 85 + (parseInt(v.id) % 15);
+        }
+        
+        document.getElementById('soSpeed').innerHTML = speed + ' <span class="text-sm text-outline font-medium">mph</span>';
+        document.getElementById('soFuel').innerHTML = fuel + '<span class="text-sm text-outline font-medium">%</span>';
+        document.getElementById('soFuelBar').style.width = fuel + '%';
+        if (fuel < 30) {
+            document.getElementById('soFuelBar').className = 'bg-error h-full rounded-full';
+        } else {
+            document.getElementById('soFuelBar').className = 'bg-secondary h-full rounded-full';
+        }
+        
+        // Set up badge status colors
+        const soBadge = document.getElementById('soBadge');
+        soBadge.textContent = v.status === 'Available' ? 'Idle' : (v.status === 'On Trip' ? 'Active' : v.status);
+        if (v.status === 'Available') {
+            soBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-outline-variant/30 text-outline';
+        } else if (v.status === 'On Trip') {
+            soBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-on-tertiary-container text-tertiary-container';
+        } else if (v.status === 'In Shop') {
+            soBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-error-container text-on-error-container';
+        } else {
+            soBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-surface-container-high text-on-surface-variant';
+        }
+        
+        // Set up Assignment details
+        const assignmentSection = document.getElementById('soAssignmentSection');
+        if (v.trip) {
+            assignmentSection.style.display = 'block';
+            document.getElementById('soDriverName').textContent = v.trip.driver_name;
+            document.getElementById('soDriverLic').textContent = v.trip.driver_license;
+            document.getElementById('soTripId').textContent = 'TRP-' + v.trip.id;
+            document.getElementById('soRoute').textContent = v.trip.source + ' → ' + v.trip.destination;
+            
+            // Set driver avatar
+            const driverImg = document.getElementById('soDriverImg');
+            if (v.trip.driver_image) {
+                driverImg.src = v.trip.driver_image;
+                driverImg.className = 'w-full h-full object-cover';
+            } else {
+                driverImg.src = '';
+                driverImg.className = 'hidden';
+            }
+        } else {
+            assignmentSection.style.display = 'none';
+        }
+        
+        // Maintenance diagnostics
+        const score = v.health_score;
+        document.getElementById('soHealthScoreText').textContent = score;
+        
+        const circle = document.getElementById('soHealthProgressCircle');
+        const dashoffset = 88 - (88 * score) / 100;
+        circle.style.strokeDashoffset = dashoffset;
+        
+        const healthHeadline = document.getElementById('soHealthHeadline');
+        const healthSub = document.getElementById('soHealthSub');
+        
+        const diagEngine = document.getElementById('diagEngine');
+        const diagBrake = document.getElementById('diagBrake');
+        const diagTire = document.getElementById('diagTire');
+        const diagTireBullet = document.getElementById('diagTireBullet');
+        
+        if (score >= 90) {
+            healthHeadline.textContent = 'Excellent Condition';
+            healthHeadline.className = 'text-xs font-semibold text-tertiary-container dark:text-tertiary-fixed-dim';
+            healthSub.textContent = `Last serviced on ${v.last_maintenance.date}. Next scheduled maintenance in 15 days.`;
+            circle.className.baseVal = 'progress-circle stroke-tertiary-container';
+            document.getElementById('soHealthScoreText').className = 'absolute text-sm font-bold text-tertiary-container';
+            
+            diagEngine.textContent = 'Pass';
+            diagEngine.className = 'font-semibold text-tertiary-container';
+            diagBrake.textContent = 'Pass';
+            diagBrake.className = 'font-semibold text-tertiary-container';
+            diagTire.textContent = 'Excellent';
+            diagTire.className = 'font-semibold text-tertiary-container';
+            diagTireBullet.className = 'w-1.5 h-1.5 rounded-full bg-tertiary-container';
+        } else if (score >= 70) {
+            healthHeadline.textContent = 'Good Condition';
+            healthHeadline.className = 'text-xs font-semibold text-primary';
+            healthSub.textContent = `Last serviced on ${v.last_maintenance.date}. Odometer at ${v.odometer}.`;
+            circle.className.baseVal = 'progress-circle stroke-primary';
+            document.getElementById('soHealthScoreText').className = 'absolute text-sm font-bold text-primary';
+            
+            diagEngine.textContent = 'Pass';
+            diagEngine.className = 'font-semibold text-tertiary-container';
+            diagBrake.textContent = 'Pass';
+            diagBrake.className = 'font-semibold text-tertiary-container';
+            diagTire.textContent = 'Monitor (6/32")';
+            diagTire.className = 'font-semibold text-secondary';
+            diagTireBullet.className = 'w-1.5 h-1.5 rounded-full bg-secondary';
+        } else {
+            healthHeadline.textContent = 'Attention Required';
+            healthHeadline.className = 'text-xs font-semibold text-error';
+            healthSub.textContent = `Flagged diagnostic code: ${v.last_maintenance.description}`;
+            circle.className.baseVal = 'progress-circle stroke-error';
+            document.getElementById('soHealthScoreText').className = 'absolute text-sm font-bold text-error';
+            
+            diagEngine.textContent = 'Check Code';
+            diagEngine.className = 'font-semibold text-error';
+            diagBrake.textContent = 'Pass';
+            diagBrake.className = 'font-semibold text-tertiary-container';
+            diagTire.textContent = 'Service';
+            diagTire.className = 'font-semibold text-error';
+            diagTireBullet.className = 'w-1.5 h-1.5 rounded-full bg-error';
+        }
+        
+        // Open Drawer
+        const panel = document.getElementById('slideOver');
+        const backdrop = document.getElementById('slideOverBackdrop');
+        const slidePanel = document.getElementById('slideOverPanel');
+        
+        panel.style.display = 'block';
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            backdrop.classList.add('opacity-100');
+            slidePanel.classList.remove('translate-x-full');
+            slidePanel.classList.add('translate-x-0');
+        }, 20);
+    }
+
+    function closeVehicleSlideOver() {
+        const backdrop = document.getElementById('slideOverBackdrop');
+        const slidePanel = document.getElementById('slideOverPanel');
+        const panel = document.getElementById('slideOver');
+        
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0');
+        slidePanel.classList.remove('translate-x-0');
+        slidePanel.classList.add('translate-x-full');
+        
+        setTimeout(() => {
+            panel.style.display = 'none';
+            activeVehicleId = null;
+        }, 300);
+    }
+</script>
 {% endblock %}

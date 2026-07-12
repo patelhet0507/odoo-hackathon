@@ -10,6 +10,7 @@ class User(AbstractUser):
         FINANCIAL_ANALYST = 'financial_analyst', 'Financial Analyst'
 
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.FLEET_MANAGER)
+    phone = models.CharField(max_length=20, blank=True)
 
     def __str__(self):
         return f"{self.get_full_name() or self.username} ({self.get_role_display()})"

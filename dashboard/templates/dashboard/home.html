@@ -1,121 +1,270 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4><i class="bi bi-speedometer2"></i> Dashboard</h4>
-    <form method="get" class="d-flex gap-2">
-        <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="">All Types</option>
-            {% for t, label in vehicle_types %}
-                <option value="{{ t }}" {% if vehicle_type_filter == t %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="">All Statuses</option>
-            {% for s, label in vehicle_statuses %}
-                <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <input type="text" name="region" placeholder="Region" class="form-control form-control-sm" value="{{ region_filter }}" style="width:120px">
+<!-- Header Row -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div>
+        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Dashboard</h1>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Real-time telemetry and overview of your logistics assets.</p>
+    </div>
+    
+    <!-- Filters form -->
+    <form method="get" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div class="relative w-full sm:w-auto min-w-[140px]">
+            <select name="type" onchange="this.form.submit()" class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all">
+                <option value="">All Types</option>
+                {% for t, label in vehicle_types %}
+                    <option value="{{ t }}" {% if vehicle_type_filter == t %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="relative w-full sm:w-auto min-w-[140px]">
+            <select name="status" onchange="this.form.submit()" class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all">
+                <option value="">All Statuses</option>
+                {% for s, label in vehicle_statuses %}
+                    <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="relative w-full sm:w-auto">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">map</span>
+            <input type="text" name="region" placeholder="Region" value="{{ region_filter }}" class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all" style="max-width: 140px;"/>
+        </div>
+        <button type="submit" class="hidden sm:inline-flex px-4 py-2 bg-primary text-on-primary rounded-xl font-medium text-sm hover:bg-secondary-container transition-colors shadow-sm">
+            Filter
+        </button>
     </form>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card kpi-card border-primary">
-            <div class="card-body">
-                <h6 class="card-subtitle text-muted">Active Vehicles</h6>
-                <h2 class="card-text text-primary">{{ active_vehicles }}</h2>
-                <small>{{ available_vehicles }} available</small>
-            </div>
+<!-- KPI Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- Active Vehicles -->
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+        <div>
+            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Active Vehicles</span>
+            <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">{{ active_vehicles }}</h2>
+            <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ available_vehicles }} available</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/25 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
+            <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">directions_car</span>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card kpi-card border-warning">
-            <div class="card-body">
-                <h6 class="card-subtitle text-muted">In Maintenance</h6>
-                <h2 class="card-text text-warning">{{ in_shop_vehicles }}</h2>
-                <small>{{ open_maintenance }} open records</small>
-            </div>
+
+    <!-- In Maintenance -->
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+        <div>
+            <span class="text-xs font-semibold text-outline tracking-wider uppercase">In Shop</span>
+            <h2 class="text-3xl font-bold text-error mt-1">{{ in_shop_vehicles }}</h2>
+            <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ open_maintenance }} open records</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error">
+            <span class="material-symbols-outlined text-[28px]">build</span>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card kpi-card border-success">
-            <div class="card-body">
-                <h6 class="card-subtitle text-muted">Active Trips</h6>
-                <h2 class="card-text text-success">{{ active_trips }}</h2>
-                <small>{{ pending_trips }} pending</small>
-            </div>
+
+    <!-- Active Trips -->
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+        <div>
+            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Active Trips</span>
+            <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ active_trips }}</h2>
+            <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ pending_trips }} pending draft</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
+            <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">route</span>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card kpi-card border-info">
-            <div class="card-body">
-                <h6 class="card-subtitle text-muted">Fleet Utilization</h6>
-                <h2 class="card-text text-info">{{ fleet_utilization }}%</h2>
-                <small>{{ total_vehicles }} total vehicles</small>
-            </div>
+
+    <!-- Fleet Utilization -->
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+        <div>
+            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Fleet Utilization</span>
+            <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">{{ fleet_utilization }}%</h2>
+            <p class="text-xs text-on-surface-variant dark:text-surface-variant mt-2 font-medium">{{ total_vehicles }} total vehicles</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
+            <span class="material-symbols-outlined text-[28px]">analytics</span>
         </div>
     </div>
 </div>
 
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header"><h6 class="mb-0">Vehicle Status</h6></div>
-            <div class="card-body"><canvas id="vehicleChart" height="200"></canvas></div>
+<!-- Charts Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Vehicle Status & Driver Status -->
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Vehicle Status Distribution</h3>
+        <div class="relative h-[240px] flex items-center justify-center">
+            <canvas id="vehicleChart"></canvas>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header"><h6 class="mb-0">Drivers</h6></div>
-            <div class="card-body"><canvas id="driverChart" height="200"></canvas></div>
+
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Driver Availability</h3>
+        <div class="relative h-[240px] flex items-center justify-center">
+            <canvas id="driverChart"></canvas>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header"><h6 class="mb-0">Trip Status</h6></div>
-            <div class="card-body"><canvas id="tripChart" height="200"></canvas></div>
+
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Trip Management Status</h3>
+        <div class="relative h-[240px]">
+            <canvas id="tripChart"></canvas>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header"><h6 class="mb-0">Fleet Overview</h6></div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <tr><td><strong>Total Vehicles</strong></td><td>{{ total_vehicles }}</td></tr>
-                    <tr><td><strong>Total Drivers</strong></td><td>{{ total_drivers }}</td></tr>
-                    <tr><td><strong>Completed Trips</strong></td><td>{{ completed_trips }}</td></tr>
-                    <tr><td><strong>Cancelled Trips</strong></td><td>{{ cancelled_trips }}</td></tr>
-                    <tr><td><strong>Expired Licenses</strong></td><td><span class="badge bg-danger">{{ expired_licenses }}</span></td></tr>
-                    <tr><td><strong>Open Maintenance</strong></td><td><span class="badge bg-warning">{{ open_maintenance }}</span></td></tr>
+
+    <!-- Fleet Overview Statistics -->
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+        <div>
+            <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Operational Summary</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <tbody class="divide-y divide-outline-variant/20">
+                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                            <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Total Vehicles</td>
+                            <td class="py-3 px-2 text-sm font-semibold text-on-surface dark:text-white text-right">{{ total_vehicles }}</td>
+                        </tr>
+                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                            <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Total Drivers</td>
+                            <td class="py-3 px-2 text-sm font-semibold text-on-surface dark:text-white text-right">{{ total_drivers }}</td>
+                        </tr>
+                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                            <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Completed Trips</td>
+                            <td class="py-3 px-2 text-sm font-semibold text-tertiary-container dark:text-tertiary-fixed-dim text-right">{{ completed_trips }}</td>
+                        </tr>
+                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                            <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Cancelled Trips</td>
+                            <td class="py-3 px-2 text-sm font-semibold text-outline text-right">{{ cancelled_trips }}</td>
+                        </tr>
+                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                            <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Expired Licenses</td>
+                            <td class="py-3 px-2 text-right">
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-error-container text-on-error-container">
+                                    {{ expired_licenses }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10">
+                            <td class="py-3 px-2 text-sm font-medium text-on-surface-variant dark:text-surface-variant">Open Maintenance Logs</td>
+                            <td class="py-3 px-2 text-right">
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-error/15 text-error">
+                                    {{ open_maintenance }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
 <script>
-new Chart(document.getElementById('vehicleChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Active ({{ active_vehicles }})','Available ({{ available_vehicles }})','In Shop ({{ in_shop_vehicles }})','Retired ({{ retired_vehicles }})'],
-        datasets: [{ data: [{{ active_vehicles }},{{ available_vehicles }},{{ in_shop_vehicles }},{{ retired_vehicles }}], backgroundColor: ['#0d6efd','#198754','#ffc107','#6c757d'] }]
-    }
-});
-new Chart(document.getElementById('driverChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['On Trip ({{ drivers_on_duty }})','Available ({{ drivers_available }})','Off Duty ({{ drivers_off_duty }})','Suspended ({{ drivers_suspended }})'],
-        datasets: [{ data: [{{ drivers_on_duty }},{{ drivers_available }},{{ drivers_off_duty }},{{ drivers_suspended }}], backgroundColor: ['#0d6efd','#198754','#6c757d','#dc3545'] }]
-    }
-});
-new Chart(document.getElementById('tripChart'), {
-    type: 'bar',
-    data: {
-        labels: ['Active','Pending','Completed','Cancelled'],
-        datasets: [{ label: 'Trips', data: [{{ active_trips }},{{ pending_trips }},{{ completed_trips }},{{ cancelled_trips }}], backgroundColor: ['#0d6efd','#ffc107','#198754','#dc3545'] }]
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    // Custom Colors matching tailwind design system
+    const colorPrimary = '#4143d5';       // Indigo (Active)
+    const colorTertiary = '#008259';      // Green (Available/Healthy)
+    const colorError = '#ba1a1a';         // Red (Shop/Maintenance)
+    const colorOutline = '#767586';       // Gray (Retired/Off duty)
+    const colorSecondary = '#645efb';     // Purple (Secondary highlight)
+
+    // Vehicle Chart
+    new Chart(document.getElementById('vehicleChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Active', 'Available', 'In Shop', 'Retired'],
+            datasets: [{
+                data: [{{ active_vehicles }}, {{ available_vehicles }}, {{ in_shop_vehicles }}, {{ retired_vehicles }}],
+                backgroundColor: [colorPrimary, colorTertiary, colorError, colorOutline],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 15,
+                        color: document.documentElement.classList.contains('dark') ? '#eff1f3' : '#191c1e',
+                        font: { family: 'Inter', size: 12 }
+                    }
+                }
+            }
+        }
+    });
+
+    // Driver Chart
+    new Chart(document.getElementById('driverChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['On Trip', 'Available', 'Off Duty', 'Suspended'],
+            datasets: [{
+                data: [{{ drivers_on_duty }}, {{ drivers_available }}, {{ drivers_off_duty }}, {{ drivers_suspended }}],
+                backgroundColor: [colorPrimary, colorTertiary, colorOutline, colorError],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 15,
+                        color: document.documentElement.classList.contains('dark') ? '#eff1f3' : '#191c1e',
+                        font: { family: 'Inter', size: 12 }
+                    }
+                }
+            }
+        }
+    });
+
+    // Trip Chart
+    new Chart(document.getElementById('tripChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Active', 'Pending', 'Completed', 'Cancelled'],
+            datasets: [{
+                label: 'Trips Count',
+                data: [{{ active_trips }}, {{ pending_trips }}, {{ completed_trips }}, {{ cancelled_trips }}],
+                backgroundColor: [colorPrimary, colorSecondary, colorTertiary, colorError],
+                borderRadius: 6,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#767586' : '#464555',
+                        font: { family: 'Inter' }
+                    },
+                    grid: { color: 'rgba(118, 117, 134, 0.1)' }
+                },
+                x: {
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#767586' : '#464555',
+                        font: { family: 'Inter' }
+                    },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
 });
 </script>
 {% endblock %}

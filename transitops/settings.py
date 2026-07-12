@@ -50,11 +50,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'transitops.wsgi.application'
 
+try:
+    import psycopg2
+    HAS_POSTGRES = True
+except ImportError:
+    HAS_POSTGRES = False
+
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
-if DATABASE_URL:
+
+if DATABASE_URL and HAS_POSTGRES:
     import dj_database_url
     DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
-else:
+elif HAS_POSTGRES:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -63,6 +70,13 @@ else:
             'PASSWORD': '0507@Hetpatel',
             'HOST': 'db.bpmtafoikxboqfjgyqrp.supabase.co',
             'PORT': '5432',
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 

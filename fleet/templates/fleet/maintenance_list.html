@@ -1,57 +1,121 @@
 {% extends 'base.html' %}
-{% block title %}Maintenance{% endblock %}
+{% block title %}Maintenance Logs{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4><i class="bi bi-tools"></i> Maintenance</h4>
-    <a href="{% url 'fleet:maintenance_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add Record</a>
+<!-- Header & Actions -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+    <div>
+        <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Maintenance Logs</h1>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Log vehicle repairs, track scheduling, and close service records once resolved.</p>
+    </div>
+    
+    <a href="{% url 'fleet:maintenance_create' %}" class="h-10 px-4 bg-primary text-on-primary rounded-xl font-medium text-xs flex items-center gap-2 hover:bg-secondary-container transition-colors shadow-sm whitespace-nowrap shrink-0">
+        <span class="material-symbols-outlined text-[16px]">add_task</span>
+        Create Record
+    </a>
 </div>
-<div class="card">
-    <div class="card-body">
-        <form method="get" class="row g-2 mb-3">
-            <div class="col-auto"><input type="text" name="q" class="form-control form-control-sm" placeholder="Search..." value="{{ query }}"></div>
-            <div class="col-auto">
-                <select name="status" class="form-select form-select-sm">
-                    <option value="">All</option>
-                    <option value="Open" {% if status_filter == 'Open' %}selected{% endif %}>Open</option>
-                    <option value="Closed" {% if status_filter == 'Closed' %}selected{% endif %}>Closed</option>
-                </select>
-            </div>
-            <div class="col-auto"><button class="btn btn-sm btn-outline-primary" type="submit">Filter</button></div>
-        </form>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead>
-                    <tr>
-                        <th>Vehicle</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th>Scheduled</th>
-                        <th>Cost</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in records %}
-                    <tr>
-                        <td>{{ r.vehicle.registration_number }}</td>
-                        <td>{{ r.description|truncatechars:40 }}</td>
-                        <td>{{ r.maintenance_type|default:'-' }}</td>
-                        <td>{{ r.scheduled_date }}</td>
-                        <td>${{ r.cost }}</td>
-                        <td><span class="badge bg-{% if r.status == 'Open' %}warning{% else %}success{% endif %}">{{ r.status }}</span></td>
-                        <td>
-                            {% if r.status == 'Open' %}
-                                <a href="{% url 'fleet:maintenance_close' r.pk %}" class="btn btn-sm btn-outline-success" onclick="return confirm('Close this maintenance record?')"><i class="bi bi-check-lg"></i> Close</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="7" class="text-center text-muted">No maintenance records.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
+<!-- Search & Filters -->
+<form method="get" class="flex flex-wrap gap-3 mb-4">
+    <div class="relative w-full sm:w-auto">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+        <input type="text" name="q" placeholder="Search vehicle registration, details..." value="{{ query }}" class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm placeholder-outline transition-all" style="min-width: 240px;"/>
+    </div>
+    <div class="relative w-full sm:w-auto">
+        <select name="status" onchange="this.form.submit()" class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest dark:bg-outline-variant/10 dark:text-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none text-sm font-medium transition-all">
+            <option value="">All Statuses</option>
+            <option value="Open" {% if status_filter == 'Open' %}selected{% endif %}>Open (In Shop)</option>
+            <option value="Closed" {% if status_filter == 'Closed' %}selected{% endif %}>Closed</option>
+        </select>
+    </div>
+    {% if query or status_filter %}
+        <a href="?" class="px-3 py-2 text-xs font-semibold text-error hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">close</span> Clear filters
+        </a>
+    {% endif %}
+</form>
+
+<!-- Maintenance Table Card -->
+<div class="bg-surface-container-lowest dark:bg-outline-variant/5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.01)] border border-outline-variant/30 overflow-hidden relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-70"></div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-outline-variant/20 bg-surface-container-low/30 dark:bg-outline-variant/5">
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Vehicle</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Description</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Type</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Scheduled Date</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Cost</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider">Status</th>
+                    <th class="py-4 px-6 font-semibold text-[11px] text-outline uppercase tracking-wider text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/15 text-sm">
+                {% for r in records %}
+                <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10 transition-colors group">
+                    <!-- Vehicle -->
+                    <td class="py-4 px-6 font-semibold text-on-surface dark:text-white">
+                        {{ r.vehicle.registration_number }}
+                        <div class="text-[10px] text-outline font-medium mt-0.5">{{ r.vehicle.name }}</div>
+                    </td>
+                    
+                    <!-- Description -->
+                    <td class="py-4 px-6 text-on-surface dark:text-white max-w-xs truncate" title="{{ r.description }}">
+                        {{ r.description|truncatechars:60 }}
+                    </td>
+
+                    <!-- Type -->
+                    <td class="py-4 px-6 font-medium text-on-surface dark:text-white">
+                        {{ r.maintenance_type|default:'General' }}
+                    </td>
+
+                    <!-- Date -->
+                    <td class="py-4 px-6 font-medium text-on-surface dark:text-white">
+                        {{ r.scheduled_date|date:"M d, Y" }}
+                    </td>
+
+                    <!-- Cost -->
+                    <td class="py-4 px-6 font-semibold text-on-surface dark:text-white">
+                        ${{ r.cost|floatformat:2 }}
+                    </td>
+
+                    <!-- Status -->
+                    <td class="py-4 px-6">
+                        {% if r.status == 'Open' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-medium border border-error-container/50">
+                                <span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+                                Open (In Shop)
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-on-tertiary-container text-tertiary-container text-xs font-medium border border-tertiary-container/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+                                Closed (Resolved)
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="py-4 px-6 text-right">
+                        {% if r.status == 'Open' %}
+                            <a href="{% url 'fleet:maintenance_close' r.pk %}" class="px-2.5 py-1 bg-tertiary-container text-on-tertiary-container rounded-lg text-xs font-semibold hover:bg-opacity-90 transition-all inline-flex items-center gap-1" onclick="return confirm('Close this maintenance record?')">
+                                <span class="material-symbols-outlined text-[14px]">done_all</span> Close Ticket
+                            </a>
+                        {% else %}
+                            <span class="text-xs text-outline font-medium">No actions</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="py-8 text-center text-outline">
+                        <span class="material-symbols-outlined text-[36px] opacity-40">handyman</span>
+                        <p class="mt-2 text-sm">No maintenance records logged.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}
