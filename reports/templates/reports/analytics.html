@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Reports & Analytics{% endblock %}
+{% block content %}
+<h4><i class="bi bi-bar-chart"></i> Reports & Analytics</h4>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card kpi-card border-info">
+            <div class="card-body">
+                <h6 class="text-muted">Fleet Utilization</h6>
+                <h3 class="text-info">{{ fleet_utilization }}%</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-success">
+            <div class="card-body">
+                <h6 class="text-muted">Fuel Efficiency</h6>
+                <h3 class="text-success">{{ fuel_efficiency }} km/L</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-warning">
+            <div class="card-body">
+                <h6 class="text-muted">Total Operational Cost</h6>
+                <h3 class="text-warning">${{ total_op_cost|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-primary">
+            <div class="card-body">
+                <h6 class="text-muted">Trip Completion Rate</h6>
+                <h3 class="text-primary">{% if total_trips %}{{ completed_trips|floatformat:0 }}/{{ total_trips }}{% else %}N/A{% endif %}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Cost Breakdown</div>
+            <div class="card-body"><canvas id="costChart" height="200"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Vehicle ROI</div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height:300px">
+                    <table class="table table-sm">
+                        <thead><tr><th>Vehicle</th><th>Acq. Cost</th><th>Maint.</th><th>Fuel Cost</th><th>ROI</th></tr></thead>
+                        <tbody>
+                            {% for v in vehicle_rois %}
+                            <tr>
+                                <td>{{ v.vehicle }}</td>
+                                <td>${{ v.acquisition_cost }}</td>
+                                <td>${{ v.maintenance_cost }}</td>
+                                <td>${{ v.fuel_cost }}</td>
+                                <td><span class="badge bg-{% if v.roi >= 0 %}success{% else %}danger{% endif %}">{{ v.roi }}%</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-muted">No data.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'reports:export_csv' 'vehicles' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i> Export Vehicles CSV</a>
+    <a href="{% url 'reports:export_csv' 'drivers' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i> Export Drivers CSV</a>
+    <a href="{% url 'reports:export_csv' 'trips' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i> Export Trips CSV</a>
+    <a href="{% url 'reports:export_csv' 'fuel' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i> Export Fuel CSV</a>
+</div>
+
+<script>
+new Chart(document.getElementById('costChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Fuel (${{ fuel_cost|floatformat:0 }})','Maintenance (${{ maint_cost|floatformat:0 }})','Other (${{ other_cost|floatformat:0 }})'],
+        datasets: [{ data: [{{ fuel_cost }},{{ maint_cost }},{{ other_cost }}], backgroundColor: ['#198754','#ffc107','#dc3545'] }]
+    }
+});
+</script>
+{% endblock %}

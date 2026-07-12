@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}{{ driver.name }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="mb-0">{{ driver.name }}</h5></div>
+            <div class="card-body">
+                <p><strong>License:</strong> {{ driver.license_number }}</p>
+                <p><strong>Category:</strong> {{ driver.license_category }}</p>
+                <p><strong>Expiry:</strong> {{ driver.license_expiry_date }}{% if driver.license_is_expired %} <span class="badge bg-danger">Expired</span>{% endif %}</p>
+                <p><strong>Contact:</strong> {{ driver.contact_number }}</p>
+                <p><strong>Safety Score:</strong> {{ driver.safety_score }}/100</p>
+                <p><strong>Status:</strong> <span class="badge bg-{% if driver.status == 'Available' %}success{% elif driver.status == 'On Trip' %}primary{% elif driver.status == 'Off Duty' %}secondary{% else %}danger{% endif %}">{{ driver.status }}</span></p>
+                <a href="{% url 'fleet:driver_update' driver.pk %}" class="btn btn-primary btn-sm">Edit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Trip History</div>
+            <div class="card-body">
+                {% for t in trips %}
+                    <p>{{ t.source }} → {{ t.destination }} ({{ t.status }})</p>
+                {% empty %}
+                    <p class="text-muted">No trips yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

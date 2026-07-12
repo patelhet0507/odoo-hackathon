@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{{ vehicle.registration_number }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="mb-0">{{ vehicle.registration_number }}</h5></div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ vehicle.name }}</p>
+                <p><strong>Model:</strong> {{ vehicle.model|default:'-' }}</p>
+                <p><strong>Type:</strong> {{ vehicle.vehicle_type }}</p>
+                <p><strong>Max Load:</strong> {{ vehicle.max_load_capacity }} kg</p>
+                <p><strong>Odometer:</strong> {{ vehicle.odometer }} km</p>
+                <p><strong>Status:</strong> <span class="badge bg-{% if vehicle.status == 'Available' %}success{% elif vehicle.status == 'On Trip' %}primary{% elif vehicle.status == 'In Shop' %}warning{% else %}secondary{% endif %}">{{ vehicle.status }}</span></p>
+                <p><strong>Region:</strong> {{ vehicle.region|default:'-' }}</p>
+                <p><strong>Acquisition Cost:</strong> ${{ vehicle.acquisition_cost }}</p>
+                <a href="{% url 'fleet:vehicle_update' vehicle.pk %}" class="btn btn-primary btn-sm">Edit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">Recent Trips</div>
+            <div class="card-body">
+                {% for t in trips %}
+                    <p class="mb-1">{{ t.source }} → {{ t.destination }} <span class="badge bg-{% if t.status == 'Completed' %}success{% elif t.status == 'Dispatched' %}primary{% else %}secondary{% endif %}">{{ t.status }}</span></p>
+                {% empty %}
+                    <p class="text-muted">No trips yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">Maintenance</div>
+            <div class="card-body">
+                {% for m in maintenance %}
+                    <p class="mb-1">{{ m.description|truncatechars:30 }} - <span class="badge bg-{% if m.status == 'Open' %}warning{% else %}success{% endif %}">{{ m.status }}</span></p>
+                {% empty %}
+                    <p class="text-muted">No maintenance records.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

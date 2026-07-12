@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Trip #{{ trip.id }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Trip #{{ trip.id }}</h5></div>
+            <div class="card-body">
+                <p><strong>Vehicle:</strong> {{ trip.vehicle.registration_number }} ({{ trip.vehicle.name }})</p>
+                <p><strong>Driver:</strong> {{ trip.driver.name }}</p>
+                <p><strong>Route:</strong> {{ trip.source }} → {{ trip.destination }}</p>
+                <p><strong>Cargo Weight:</strong> {{ trip.cargo_weight }} kg</p>
+                <p><strong>Planned Distance:</strong> {{ trip.planned_distance }} km</p>
+                {% if trip.actual_distance %}<p><strong>Actual Distance:</strong> {{ trip.actual_distance }} km</p>{% endif %}
+                <p><strong>Status:</strong> <span class="badge bg-{% if trip.status == 'Draft' %}secondary{% elif trip.status == 'Dispatched' %}primary{% elif trip.status == 'Completed' %}success{% else %}danger{% endif %}">{{ trip.status }}</span></p>
+                {% if trip.dispatched_at %}<p><strong>Dispatched:</strong> {{ trip.dispatched_at }}</p>{% endif %}
+                {% if trip.completed_at %}<p><strong>Completed:</strong> {{ trip.completed_at }}</p>{% endif %}
+                {% if trip.fuel_consumed %}<p><strong>Fuel Consumed:</strong> {{ trip.fuel_consumed }} L</p>{% endif %}
+                <a href="{% url 'fleet:trip_list' %}" class="btn btn-secondary btn-sm">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

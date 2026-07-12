@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Trips{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-map"></i> Trips</h4>
+    <a href="{% url 'fleet:trip_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Create Trip</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-auto"><input type="text" name="q" class="form-control form-control-sm" placeholder="Search source/destination..." value="{{ query }}"></div>
+            <div class="col-auto">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All Statuses</option>
+                    {% for s, label in trip_statuses %}
+                        <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto"><button class="btn btn-sm btn-outline-primary" type="submit">Filter</button></div>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Vehicle</th>
+                        <th>Driver</th>
+                        <th>Route</th>
+                        <th>Cargo (kg)</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in trips %}
+                    <tr>
+                        <td>{{ t.id }}</td>
+                        <td>{{ t.vehicle.registration_number }}</td>
+                        <td>{{ t.driver.name }}</td>
+                        <td>{{ t.source }} → {{ t.destination }}</td>
+                        <td>{{ t.cargo_weight }}</td>
+                        <td><span class="badge bg-{% if t.status == 'Draft' %}secondary{% elif t.status == 'Dispatched' %}primary{% elif t.status == 'Completed' %}success{% else %}danger{% endif %}">{{ t.status }}</span></td>
+                        <td>
+                            <a href="{% url 'fleet:trip_detail' t.pk %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                            {% if t.status == 'Draft' %}
+                                <a href="{% url 'fleet:trip_dispatch' t.pk %}" class="btn btn-sm btn-outline-success" onclick="return confirm('Dispatch this trip?')"><i class="bi bi-send"></i> Dispatch</a>
+                            {% endif %}
+                            {% if t.status == 'Dispatched' %}
+                                <a href="{% url 'fleet:trip_complete' t.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check-lg"></i> Complete</a>
+                            {% endif %}
+                            {% if t.status == 'Draft' or t.status == 'Dispatched' %}
+                                <a href="{% url 'fleet:trip_cancel' t.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel this trip?')"><i class="bi bi-x-lg"></i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted">No trips found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

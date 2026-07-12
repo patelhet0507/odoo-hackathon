@@ -1,0 +1,49 @@
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+}
+
+[data-bs-theme="dark"] {
+    --bg-primary: #1a1d20;
+    --bg-secondary: #212529;
+    --text-primary: #f8f9fa;
+    --text-secondary: #adb5bd;
+    --card-bg: #2c3034;
+    --border-color: #373b3e;
+}
+
+body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.table {
+    color: var(--text-primary);
+}
+
+.kpi-card {
+    border-left: 4px solid;
+    transition: transform 0.2s;
+}
+.kpi-card:hover {
+    transform: translateY(-2px);
+}
+
+.search-box {
+    max-width: 300px;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+}

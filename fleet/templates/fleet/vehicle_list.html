@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Vehicles{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-truck"></i> Vehicles</h4>
+    <a href="{% url 'fleet:vehicle_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add Vehicle</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-auto"><input type="text" name="q" class="form-control form-control-sm" placeholder="Search..." value="{{ query }}"></div>
+            <div class="col-auto">
+                <select name="type" class="form-select form-select-sm">
+                    <option value="">All Types</option>
+                    {% for t, label in vehicle_types %}
+                        <option value="{{ t }}" {% if type_filter == t %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All Statuses</option>
+                    {% for s, label in vehicle_statuses %}
+                        <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto"><button class="btn btn-sm btn-outline-primary" type="submit">Filter</button></div>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>Reg #</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Max Load (kg)</th>
+                        <th>Odometer (km)</th>
+                        <th>Status</th>
+                        <th>Region</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vehicles %}
+                    <tr>
+                        <td><a href="{% url 'fleet:vehicle_detail' v.pk %}">{{ v.registration_number }}</a></td>
+                        <td>{{ v.name }}</td>
+                        <td>{{ v.vehicle_type }}</td>
+                        <td>{{ v.max_load_capacity }}</td>
+                        <td>{{ v.odometer }}</td>
+                        <td><span class="badge bg-{% if v.status == 'Available' %}success{% elif v.status == 'On Trip' %}primary{% elif v.status == 'In Shop' %}warning{% else %}secondary{% endif %}">{{ v.status }}</span></td>
+                        <td>{{ v.region|default:'-' }}</td>
+                        <td>
+                            <a href="{% url 'fleet:vehicle_update' v.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'fleet:vehicle_delete' v.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center text-muted">No vehicles found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pages > 1 %}
+        <nav><ul class="pagination pagination-sm">
+            {% for p in page_range %}
+                <li class="page-item {% if p == page %}active{% endif %}"><a class="page-link" href="?page={{ p }}{% if query %}&q={{ query }}{% endif %}">{{ p }}</a></li>
+            {% endfor %}
+        </ul></nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

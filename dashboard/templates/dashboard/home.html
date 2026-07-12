@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-speedometer2"></i> Dashboard</h4>
+    <form method="get" class="d-flex gap-2">
+        <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">All Types</option>
+            {% for t, label in vehicle_types %}
+                <option value="{{ t }}" {% if vehicle_type_filter == t %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            {% for s, label in vehicle_statuses %}
+                <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="region" placeholder="Region" class="form-control form-control-sm" value="{{ region_filter }}" style="width:120px">
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card kpi-card border-primary">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">Active Vehicles</h6>
+                <h2 class="card-text text-primary">{{ active_vehicles }}</h2>
+                <small>{{ available_vehicles }} available</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-warning">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">In Maintenance</h6>
+                <h2 class="card-text text-warning">{{ in_shop_vehicles }}</h2>
+                <small>{{ open_maintenance }} open records</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-success">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">Active Trips</h6>
+                <h2 class="card-text text-success">{{ active_trips }}</h2>
+                <small>{{ pending_trips }} pending</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-info">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">Fleet Utilization</h6>
+                <h2 class="card-text text-info">{{ fleet_utilization }}%</h2>
+                <small>{{ total_vehicles }} total vehicles</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Vehicle Status</h6></div>
+            <div class="card-body"><canvas id="vehicleChart" height="200"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Drivers</h6></div>
+            <div class="card-body"><canvas id="driverChart" height="200"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Trip Status</h6></div>
+            <div class="card-body"><canvas id="tripChart" height="200"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Fleet Overview</h6></div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><td><strong>Total Vehicles</strong></td><td>{{ total_vehicles }}</td></tr>
+                    <tr><td><strong>Total Drivers</strong></td><td>{{ total_drivers }}</td></tr>
+                    <tr><td><strong>Completed Trips</strong></td><td>{{ completed_trips }}</td></tr>
+                    <tr><td><strong>Cancelled Trips</strong></td><td>{{ cancelled_trips }}</td></tr>
+                    <tr><td><strong>Expired Licenses</strong></td><td><span class="badge bg-danger">{{ expired_licenses }}</span></td></tr>
+                    <tr><td><strong>Open Maintenance</strong></td><td><span class="badge bg-warning">{{ open_maintenance }}</span></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+new Chart(document.getElementById('vehicleChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Active ({{ active_vehicles }})','Available ({{ available_vehicles }})','In Shop ({{ in_shop_vehicles }})','Retired ({{ retired_vehicles }})'],
+        datasets: [{ data: [{{ active_vehicles }},{{ available_vehicles }},{{ in_shop_vehicles }},{{ retired_vehicles }}], backgroundColor: ['#0d6efd','#198754','#ffc107','#6c757d'] }]
+    }
+});
+new Chart(document.getElementById('driverChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['On Trip ({{ drivers_on_duty }})','Available ({{ drivers_available }})','Off Duty ({{ drivers_off_duty }})','Suspended ({{ drivers_suspended }})'],
+        datasets: [{ data: [{{ drivers_on_duty }},{{ drivers_available }},{{ drivers_off_duty }},{{ drivers_suspended }}], backgroundColor: ['#0d6efd','#198754','#6c757d','#dc3545'] }]
+    }
+});
+new Chart(document.getElementById('tripChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Active','Pending','Completed','Cancelled'],
+        datasets: [{ label: 'Trips', data: [{{ active_trips }},{{ pending_trips }},{{ completed_trips }},{{ cancelled_trips }}], backgroundColor: ['#0d6efd','#ffc107','#198754','#dc3545'] }]
+    }
+});
+</script>
+{% endblock %}
