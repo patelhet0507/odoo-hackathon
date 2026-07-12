@@ -98,21 +98,16 @@
                     </td>
 
                     <!-- Driver & Trip -->
+                    {% with active_trip=v.active_trip_list.0 %}
                     <td class="py-4 px-6">
-                        {% if v.active_driver %}
+                        {% if active_trip %}
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-full bg-surface-container-high dark:bg-outline-variant/30 overflow-hidden shrink-0 flex items-center justify-center">
-                                {% if 'Rajesh' in v.active_driver.name %}
-                                    <img alt="Driver" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-b7ovXTJAePpKjW6WE0xk8OFhS31bjnfC2ND7jPrZsDWlIj-p4JKUorvT6OLP_S8RrL80CHmkj562UAPoV2We2Pz64UIX3hu_tLyoctiE8tDsiz21qGLzvemjIP7S1Xh5QuRvJ7jxh1YuwewsOKjrRjOB9iFNZFhEB90Nzrloynl-iXXJuAbFApF45B8q4tV9PO0zFp91hcpg0xNhnIhPF2vIXRdWPi3rZhKvkhiqqZ05apRfrtLNcoeXewMOoof-7jx5s4oheZvk"/>
-                                {% elif 'Priya' in v.active_driver.name %}
-                                    <img alt="Driver" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIgCTMMlTB9hJp0ocV6yu5HboOQM2Vd6RoA4LE0VA9eoL2fBFcQ3H9pea6Te8Jc_S0rscmsj7utCYJcWUDdYfg4hGoU67pda4aNbZZwqll4BbhmeiaPuk3_1yW0cOH6foMHLc-wVEyYQyfU18NGO29gE_PV_OrpsRsAf5zOIzZMeQTAwpAYGdDYEey1k3zmdGjjkjSp86ImeoJ0JZS2E48qc2bmg9GE8B0TZicxj6jf466C0gDMeMhcAlsEpCQLaw_gi7wp-EyNAGk"/>
-                                {% else %}
-                                    <span class="material-symbols-outlined text-outline text-sm">person</span>
-                                {% endif %}
+                                <span class="material-symbols-outlined text-outline text-sm">person</span>
                             </div>
                             <div>
-                                <div class="text-xs font-semibold text-on-surface dark:text-white">{{ v.active_driver.name }}</div>
-                                <div class="text-[10px] text-outline font-code-sm uppercase mt-0.5">TRP-{{ v.active_trip.id }}</div>
+                                <div class="text-xs font-semibold text-on-surface dark:text-white">{{ active_trip.driver.name }}</div>
+                                <div class="text-[10px] text-outline font-code-sm uppercase mt-0.5">TRP-{{ active_trip.id }}</div>
                             </div>
                         </div>
                         {% else %}
@@ -127,13 +122,15 @@
                         </div>
                         {% endif %}
                     </td>
+                    {% endwith %}
 
                     <!-- Last Maintenance -->
+                    {% with last_maint=v.recent_maintenance_list.0 %}
                     <td class="py-4 px-6 hidden md:table-cell">
-                        {% if v.last_maintenance_record %}
-                            <div class="text-xs font-medium text-on-surface dark:text-white">{{ v.last_maintenance_record.completed_date|default:v.last_maintenance_record.scheduled_date|date:"M d, Y" }}</div>
+                        {% if last_maint %}
+                            <div class="text-xs font-medium text-on-surface dark:text-white">{{ last_maint.completed_date|default:last_maint.scheduled_date|date:"M d, Y" }}</div>
                             <div class="text-[10px] text-outline mt-0.5">
-                                {% if v.last_maintenance_record.status == 'Open' %}
+                                {% if last_maint.status == 'Open' %}
                                     <span class="text-error font-semibold">Scheduled today</span>
                                 {% else %}
                                     Serviced
@@ -144,6 +141,7 @@
                             <div class="text-[10px] text-on-surface-variant/40">--</div>
                         {% endif %}
                     </td>
+                    {% endwith %}
 
                     <!-- Health Progress -->
                     <td class="py-4 px-6">

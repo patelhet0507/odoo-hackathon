@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Prefetch
+from django.views.decorators.cache import cache_page
 from .models import Vehicle, Driver, Trip, MaintenanceRecord, FuelLog, Expense, VehicleDocument
 from .forms import (VehicleForm, DriverForm, TripForm, TripCompleteForm,
                     MaintenanceForm, FuelLogForm, ExpenseForm)
@@ -30,7 +31,20 @@ def search_queryset(request, queryset, fields):
 
 @login_required
 def vehicle_list(request):
-    qs = Vehicle.objects.all()
+    # ponytail: 2 prefetches replace 9 correlated subqueries (was 9N hits, now ~2)
+    qs = Vehicle.objects.prefetch_related(
+        Prefetch(
+            'trips',
+            queryset=Trip.objects.filter(status='Dispatched')
+            .select_related('driver').order_by('-created_at')[:1],
+            to_attr='active_trip_list',
+        ),
+        Prefetch(
+            'maintenance_records',
+            queryset=MaintenanceRecord.objects.order_by('-completed_date', '-scheduled_date')[:1],
+            to_attr='recent_maintenance_list',
+        ),
+    )
     qs, query = search_queryset(request, qs, ['registration_number', 'name', 'model', 'region'])
     type_filter = request.GET.get('type', '')
     status_filter = request.GET.get('status', '')

@@ -1,7 +1,8 @@
 import os, csv, io
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.views.decorators.cache import cache_page
+from django.db.models import Sum, Subquery, OuterRef
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.conf import settings
@@ -15,13 +16,12 @@ except ImportError:
 
 
 @login_required
+@cache_page(120)
 def analytics(request):
-    # Fleet utilization
     total = Vehicle.objects.count()
     active_veh = Vehicle.objects.filter(status=Vehicle.Status.ON_TRIP).count()
     fleet_util = round((active_veh / total * 100), 1) if total else 0
 
-    # Fuel efficiency (total distance / total fuel)
     trip_stats = Trip.objects.filter(status=Trip.Status.COMPLETED).aggregate(
         total_distance=Sum('actual_distance'),
         total_fuel=Sum('fuel_consumed'),
@@ -30,31 +30,39 @@ def analytics(request):
     total_fuel = trip_stats['total_fuel'] or 0
     fuel_efficiency = round(float(total_distance) / float(total_fuel), 2) if total_fuel else 0
 
-    # Operational costs
     fuel_cost = FuelLog.objects.aggregate(total=Sum('cost'))['total'] or 0
     maint_cost = MaintenanceRecord.objects.aggregate(total=Sum('cost'))['total'] or 0
     other_cost = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
     total_op_cost = float(fuel_cost) + float(maint_cost) + float(other_cost)
 
-    # Vehicle ROI per vehicle
+    # ponytail: two dict lookups instead of N aggregate queries per vehicle
+    maint_by_vehicle = dict(
+        MaintenanceRecord.objects.values_list('vehicle_id')
+        .annotate(total=Sum('cost'))
+        .values_list('vehicle_id', 'total')
+    )
+    fuel_by_vehicle = dict(
+        FuelLog.objects.values_list('vehicle_id')
+        .annotate(total=Sum('cost'))
+        .values_list('vehicle_id', 'total')
+    )
+
     vehicle_rois = []
     for v in Vehicle.objects.all():
-        total_revenue = 0
-        maint = MaintenanceRecord.objects.filter(vehicle=v).aggregate(Sum('cost'))['cost__sum'] or 0
-        fuel = FuelLog.objects.filter(vehicle=v).aggregate(Sum('cost'))['cost__sum'] or 0
-        total_exp = float(maint) + float(fuel)
+        maint = float(maint_by_vehicle.get(v.pk, 0) or 0)
+        fuel = float(fuel_by_vehicle.get(v.pk, 0) or 0)
+        total_exp = maint + fuel
         acq = float(v.acquisition_cost)
-        roi = round(((total_revenue - total_exp) / acq) * 100, 1) if acq else 0
+        roi = round(((0 - total_exp) / acq) * 100, 1) if acq else 0
         vehicle_rois.append({
             'vehicle': str(v),
             'acquisition_cost': acq,
-            'maintenance_cost': float(maint),
-            'fuel_cost': float(fuel),
+            'maintenance_cost': maint,
+            'fuel_cost': fuel,
             'total_cost': total_exp,
             'roi': roi,
         })
 
-    # Trip completion stats
     completed = Trip.objects.filter(status=Trip.Status.COMPLETED).count()
     cancelled = Trip.objects.filter(status=Trip.Status.CANCELLED).count()
 
@@ -129,5 +137,3 @@ def export_pdf(request):
     response['Content-Disposition'] = 'attachment; filename="transitops_report.pdf"'
     pisa.CreatePDF(io.BytesIO(html.encode('UTF-8')), dest=response)
     return response
-
-
