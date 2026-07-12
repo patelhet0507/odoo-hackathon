@@ -1,4 +1,5 @@
 {
+  "framework": null,
   "buildCommand": "python manage.py collectstatic --noinput",
   "installCommand": "pip install -r requirements.txt",
   "outputDirectory": "staticfiles",
