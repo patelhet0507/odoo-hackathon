@@ -83,7 +83,7 @@
                         </span>
                     </td>
                     <td class="py-3 px-4 text-on-surface-variant whitespace-nowrap">{{ log.module }}</td>
-                    <td class="py-3 px-4 text-on-surface-variant truncate" title="{{ log.object_repr }}">{{ log.object_repr|truncatechars:40 }}</td>
+                    <td class="py-3 px-4 text-on-surface-variant truncate" title="{{ log.object_repr }}">{{ log.object_repr|default:"-"|truncatechars:40 }}</td>
                     <td class="py-3 px-4 text-outline text-xs font-mono whitespace-nowrap hidden md:table-cell">{{ log.ip_address|default:"-" }}</td>
                 </tr>
                 {% empty %}
