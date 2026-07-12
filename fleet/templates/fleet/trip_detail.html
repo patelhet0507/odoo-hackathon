@@ -2,9 +2,16 @@
 {% block title %}Trip Details - TRP-{{ trip.id }}{% endblock %}
 {% block content %}
 <div class="max-w-2xl mx-auto mt-8 animate-fade-in">
-    <a href="{% url 'fleet:trip_list' %}" class="inline-flex items-center gap-1 text-xs font-semibold text-primary dark:text-primary-fixed-dim hover:underline mb-4">
-        <span class="material-symbols-outlined text-[14px]">arrow_back</span> Back to Trips
-    </a>
+    <div class="flex justify-between items-center mb-4">
+        <a href="{% url 'fleet:trip_list' %}" class="inline-flex items-center gap-1 text-xs font-semibold text-primary dark:text-primary-fixed-dim hover:underline">
+            <span class="material-symbols-outlined text-[14px]">arrow_back</span> Back to Trips
+        </a>
+        {% if trip.status == 'Dispatched' or trip.status == 'Completed' %}
+        <a href="{% url 'fleet:trip_timeline' trip.pk %}" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim hover:bg-primary/20 transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">timeline</span> Timeline &amp; Route
+        </a>
+        {% endif %}
+    </div>
     
     <div class="bg-white dark:bg-[#1E1E2F] border border-outline-variant/20 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden relative">
         <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary opacity-60"></div>

@@ -40,6 +40,25 @@ urlpatterns = [
     # Expenses
     path('expenses/', views.expense_list, name='expense_list'),
     path('expenses/create/', views.expense_create, name='expense_create'),
+
+    # Audit Logs
+    path('audit-logs/', views.audit_log_list, name='audit_log_list'),
+
+    # Notifications
+    path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/unread-count/', views.notification_unread_count, name='notification_unread_count'),
+    path('notifications/<int:pk>/mark-read/', views.notification_mark_read, name='notification_mark_read'),
+    path('notifications/mark-all-read/', views.notification_mark_all_read, name='notification_mark_all_read'),
+    path('notifications/<int:pk>/delete/', views.notification_delete, name='notification_delete'),
+
+    # Live Tracking
+    path('live-tracking/', views.live_tracking, name='live_tracking'),
+    path('live-tracking/locations.json', views.vehicle_locations_json, name='vehicle_locations_json'),
+    path('live-tracking/route/<int:pk>.json', views.vehicle_route_json, name='vehicle_route_json'),
+    path('live-tracking/simulate/', views.simulate_location, name='simulate_location'),
+
+    # Trip Timeline
+    path('trips/<int:pk>/timeline/', views.trip_timeline, name='trip_timeline'),
 ]
 
 

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}Live Vehicle Tracking{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4 animate-fade-in">
+    <div>
+        <h1 class="text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Live Vehicle Tracking</h1>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Real-time GPS tracking of active fleet vehicles.</p>
+    </div>
+    <div class="flex items-center gap-2">
+        <span id="updateStatus" class="text-xs text-outline font-medium">Updating...</span>
+        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse" id="statusDot"></span>
+        {% if is_fleet_manager %}
+        <button onclick="simulateGPS()" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-white hover:bg-surface-container-high transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">my_location</span> Simulate GPS
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+    <div class="lg:col-span-3">
+        <div id="map" class="w-full h-[500px] md:h-[600px] rounded-2xl border border-outline-variant/20 dark:border-white/5 shadow-sm z-0" style="background: #e8e8e8;"></div>
+    </div>
+    <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 p-4 max-h-[600px] overflow-y-auto">
+        <h3 class="text-sm font-bold text-on-surface dark:text-white mb-3">Active Vehicles</h3>
+        <div id="vehicleList" class="space-y-2">
+            {% for trip in active_trips %}
+            <div class="p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/5 border border-outline-variant/20 dark:border-white/10 text-xs vehicle-list-item" data-vehicle-id="{{ trip.vehicle_id }}">
+                <div class="font-semibold text-on-surface dark:text-white">{{ trip.vehicle.registration_number }}</div>
+                <div class="text-outline mt-0.5">{{ trip.vehicle.name }}</div>
+                <div class="text-outline mt-1">
+                    <span class="material-symbols-outlined text-[12px] align-text-bottom">person</span> {{ trip.driver.name }}
+                </div>
+                <div class="text-outline truncate mt-1">{{ trip.source }} → {{ trip.destination }}</div>
+                <div class="flex items-center gap-2 mt-1.5">
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-primary">ETA: --</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-outline text-xs text-center py-6">No active trips right now.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var map = L.map('map').setView([19.0760, 72.8777], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    var markers = {};
+    var vehicleIcons = {};
+
+    function getVehicleIcon(heading) {
+        return L.divIcon({
+            html: '<div style="transform: rotate(' + heading + 'deg); font-size: 24px; text-align: center;">&#128666;</div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            className: 'vehicle-marker'
+        });
+    }
+
+    function updateLocations() {
+        fetch('{% url "fleet:vehicle_locations_json" %}')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('updateStatus').textContent = new Date().toLocaleTimeString();
+                var activeIds = [];
+
+                data.vehicles.forEach(function (v) {
+                    activeIds.push(v.id);
+                    var latlng = [v.lat, v.lng];
+
+                    if (markers[v.id]) {
+                        markers[v.id].setLatLng(latlng);
+                        if (vehicleIcons[v.id]) {
+                            vehicleIcons[v.id].setHtml('<div style="transform: rotate(' + v.heading + 'deg); font-size: 24px; text-align: center;">&#128666;</div>');
+                        }
+                    } else {
+                        var icon = getVehicleIcon(v.heading);
+                        vehicleIcons[v.id] = icon;
+                        var marker = L.marker(latlng, { icon: icon })
+                            .addTo(map)
+                            .bindPopup(
+                                '<div style="min-width:180px;">' +
+                                '<div class="font-bold text-sm">' + v.registration + '</div>' +
+                                '<div class="text-xs text-gray-500">' + v.name + '</div>' +
+                                '<hr class="my-1"/>' +
+                                '<div class="text-xs"><b>Driver:</b> ' + v.driver + '</div>' +
+                                '<div class="text-xs"><b>Speed:</b> ' + parseFloat(v.speed).toFixed(1) + ' km/h</div>' +
+                                '<div class="text-xs"><b>Route:</b> ' + v.source + ' → ' + v.destination + '</div>' +
+                                '<div class="text-xs"><b>Status:</b> ' + v.status + '</div>' +
+                                '</div>'
+                            );
+                        markers[v.id] = marker;
+                    }
+
+                    var listItem = document.querySelector('.vehicle-list-item[data-vehicle-id="' + v.id + '"]');
+                    if (listItem) {
+                        var etaSpan = listItem.querySelector('.text-primary');
+                        if (etaSpan) etaSpan.textContent = 'ETA: ' + parseFloat(v.speed).toFixed(0) + ' km/h';
+                    }
+                });
+
+                Object.keys(markers).forEach(function (id) {
+                    if (!activeIds.includes(parseInt(id))) {
+                        map.removeLayer(markers[id]);
+                        delete markers[id];
+                        delete vehicleIcons[id];
+                    }
+                });
+
+                if (data.vehicles.length > 0) {
+                    var bounds = [];
+                    data.vehicles.forEach(function (v) { bounds.push([v.lat, v.lng]); });
+                    if (bounds.length > 0) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+                }
+            })
+            .catch(function () {
+                document.getElementById('statusDot').className = 'w-2 h-2 rounded-full bg-red-500';
+            });
+    }
+
+    updateLocations();
+    setInterval(updateLocations, 8000);
+});
+
+function simulateGPS() {
+    var btn = event.target.closest('button');
+    btn.disabled = true;
+    btn.textContent = 'Simulating...';
+    fetch('{% url "fleet:simulate_location" %}', { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } })
+        .then(r => r.json())
+        .then(function() { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">my_location</span> Simulate GPS'; updateLocations(); })
+        .catch(function() { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">my_location</span> Simulate GPS'; });
+}
+</script>
+
+<style>
+.vehicle-marker { background: none !important; border: none !important; }
+.dark .leaflet-popup-content-wrapper { background: #1E1E2F; color: #e0e3e5; }
+.dark .leaflet-popup-tip { background: #1E1E2F; }
+</style>
+{% endblock %}

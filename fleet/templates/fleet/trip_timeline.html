@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Trip Timeline #{{ trip.id }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4 animate-fade-in">
+    <div>
+        <h1 class="text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Trip Timeline #{{ trip.id }}</h1>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">{{ trip.source }} → {{ trip.destination }}</p>
+    </div>
+    <div class="flex items-center gap-2">
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold
+            {% if trip.status == 'Completed' %}bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300
+            {% elif trip.status == 'Dispatched' %}bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300
+            {% else %}bg-outline/10 text-on-surface-variant{% endif %}">
+            {{ trip.status }}
+        </span>
+        <button onclick="window.print()" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-white hover:bg-surface-container-high transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">print</span> Print / PDF
+        </button>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Timeline -->
+    <div class="lg:col-span-2">
+        <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 p-6 reveal">
+            <h2 class="text-sm font-bold text-on-surface dark:text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">timeline</span>
+                Trip Lifecycle
+            </h2>
+            <div class="relative pl-8 border-l-2 border-outline-variant/30 dark:border-white/10 space-y-6">
+                <div class="relative">
+                    <div class="absolute -left-[33px] w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold shadow">&#10003;</div>
+                    <div>
+                        <p class="text-xs font-bold text-on-surface dark:text-white">Trip Created</p>
+                        <p class="text-[10px] text-outline font-mono">{{ trip.created_at|date:"M d, Y  H:i:s" }}</p>
+                        <p class="text-xs text-on-surface-variant mt-0.5">Trip from {{ trip.source }} to {{ trip.destination }} created as {{ trip.get_previous_status_display|default:"Draft" }}.</p>
+                    </div>
+                </div>
+                {% if trip.dispatched_at %}
+                <div class="relative">
+                    <div class="absolute -left-[33px] w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold shadow">&#9654;</div>
+                    <div>
+                        <p class="text-xs font-bold text-on-surface dark:text-white">Dispatched</p>
+                        <p class="text-[10px] text-outline font-mono">{{ trip.dispatched_at|date:"M d, Y  H:i:s" }}</p>
+                        <p class="text-xs text-on-surface-variant mt-0.5">Vehicle {{ trip.vehicle.registration_number }} assigned, driver {{ trip.driver.name }} on route.</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if trip.completed_at %}
+                <div class="relative">
+                    <div class="absolute -left-[33px] w-6 h-6 rounded-full bg-tertiary flex items-center justify-center text-white text-xs font-bold shadow">&#9632;</div>
+                    <div>
+                        <p class="text-xs font-bold text-on-surface dark:text-white">Completed</p>
+                        <p class="text-[10px] text-outline font-mono">{{ trip.completed_at|date:"M d, Y  H:i:s" }}</p>
+                        <p class="text-xs text-on-surface-variant mt-0.5">Trip completed. Distance: {{ trip.actual_distance|default:trip.planned_distance }} km.</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if checkpoints %}
+                {% for cp in checkpoints %}
+                <div class="relative">
+                    <div class="absolute -left-[33px] w-6 h-6 rounded-full {% if cp.is_current_location %}bg-primary animate-pulse{% else %}bg-outline-variant dark:bg-white/20{% endif %} flex items-center justify-center text-white text-xs font-bold shadow">
+                        {% if cp.is_current_location %}&#9679;{% else %}&#9679;{% endif %}
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-on-surface dark:text-white">{{ cp.name }}</p>
+                        <p class="text-[10px] text-outline font-mono">{{ cp.created_at|date:"M d, Y  H:i:s" }}</p>
+                        {% if cp.description %}<p class="text-xs text-on-surface-variant mt-0.5">{{ cp.description }}</p>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="relative">
+                    <div class="absolute -left-[33px] w-6 h-6 rounded-full bg-outline-variant dark:bg-white/10 flex items-center justify-center text-outline">?</div>
+                    <div>
+                        <p class="text-xs text-on-surface-variant italic">No checkpoint data available for this trip.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Route Map -->
+    <div class="lg:col-span-1">
+        <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 overflow-hidden reveal">
+            <div id="routeMap" class="w-full h-[400px]" style="background: #e8e8e8;"></div>
+        </div>
+
+        <div class="bg-white dark:bg-[#1E1E2F] rounded-2xl border border-outline-variant/20 dark:border-white/5 p-4 mt-4 reveal">
+            <h3 class="text-xs font-bold text-on-surface dark:text-white mb-3">Trip Details</h3>
+            <dl class="space-y-2 text-xs">
+                <div class="flex justify-between"><dt class="text-outline">Vehicle</dt><dd class="font-medium text-on-surface dark:text-white">{{ trip.vehicle.registration_number }}</dd></div>
+                <div class="flex justify-between"><dt class="text-outline">Driver</dt><dd class="font-medium text-on-surface dark:text-white">{{ trip.driver.name }}</dd></div>
+                <div class="flex justify-between"><dt class="text-outline">Distance</dt><dd class="font-medium text-on-surface dark:text-white">{{ trip.actual_distance|default:trip.planned_distance }} km</dd></div>
+                <div class="flex justify-between"><dt class="text-outline">Cargo</dt><dd class="font-medium text-on-surface dark:text-white">{{ trip.cargo_weight }} kg</dd></div>
+                {% if trip.fuel_consumed %}
+                <div class="flex justify-between"><dt class="text-outline">Fuel Used</dt><dd class="font-medium text-on-surface dark:text-white">{{ trip.fuel_consumed }} L</dd></div>
+                {% endif %}
+                <div class="flex justify-between"><dt class="text-outline">Status</dt><dd class="font-medium">{{ trip.get_status_display }}</dd></div>
+            </dl>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var map = L.map('routeMap').setView([19.0760, 72.8777], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18, attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    fetch('{% url "fleet:vehicle_route_json" trip.pk %}')
+        .then(r => r.json())
+        .then(data => {
+            if (data.route && data.route.length > 0) {
+                var points = data.route.map(function (p) { return [p.lat, p.lng]; });
+                L.polyline(points, { color: '#4143d5', weight: 3, opacity: 0.7 }).addTo(map);
+                L.marker(points[0]).addTo(map).bindPopup('<b>Source:</b> ' + data.source);
+                L.marker(points[points.length - 1]).addTo(map).bindPopup('<b>Destination:</b> ' + data.destination);
+                if (data.current) {
+                    L.marker([data.current.lat, data.current.lng], {
+                        icon: L.divIcon({
+                            html: '<div style="font-size: 20px; text-align: center;">&#128666;</div>',
+                            iconSize: [24, 24], iconAnchor: [12, 12], className: 'vehicle-marker'
+                        })
+                    }).addTo(map).bindPopup('<b>Current Location</b>');
+                    points.push([data.current.lat, data.current.lng]);
+                }
+                map.fitBounds(L.latLngBounds(points), { padding: [30, 30] });
+            }
+        });
+});
+</script>
+
+<style>
+.vehicle-marker { background: none !important; border: none !important; }
+.dark .leaflet-popup-content-wrapper { background: #1E1E2F; color: #e0e3e5; }
+.dark .leaflet-popup-tip { background: #1E1E2F; }
+@media print { .no-print { display: none !important; } }
+</style>
+{% endblock %}

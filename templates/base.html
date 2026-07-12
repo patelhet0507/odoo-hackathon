@@ -361,6 +361,14 @@
         </a>
         {% endif %}
         
+        <!-- Live Tracking -->
+        {% if can_manage_vehicles %}
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'live-tracking' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:live_tracking' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'live-tracking' in request.path %}1{% else %}0{% endif %};">near_me</span>
+            <span>Live Tracking</span>
+        </a>
+        {% endif %}
+        
         <!-- Maintenance (fleet_manager, safety_officer) -->
         {% if can_manage_maintenance %}
         <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'maintenance' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:maintenance_list' %}">
@@ -394,6 +402,14 @@
             <span>Analytics</span>
         </a>
         {% endif %}
+        
+        <!-- Audit Logs (fleet_manager only) -->
+        {% if is_fleet_manager %}
+        <a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {% if 'audit-logs' in request.path %}bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-fixed-dim shadow-[inset_0_0_12px_rgba(65,67,213,0.08)]{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/70 dark:text-surface-variant dark:hover:text-white dark:hover:bg-white/5{% endif %}" href="{% url 'fleet:audit_log_list' %}">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if 'audit-logs' in request.path %}1{% else %}0{% endif %};">history</span>
+            <span>Audit Logs</span>
+        </a>
+        {% endif %}
     </div>
     {% endwith %}
     
@@ -423,6 +439,13 @@
         </div>
         
         <div class="flex items-center gap-sm">
+            <!-- Notification Bell -->
+            <div class="relative">
+                <button id="notificationBell" onclick="window.location.href='{% url 'fleet:notification_list' %}'" class="p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-white/10 rounded-full transition-colors relative" aria-label="Notifications">
+                    <span class="material-symbols-outlined text-[20px]">notifications</span>
+                    <span id="notificationBadge" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-error text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+            </div>
             <!-- Search Input -->
             <form method="get" action="{% if is_fleet_manager or is_safety_officer or is_financial_analyst %}{% url 'fleet:vehicle_list' %}{% else %}{% url 'fleet:trip_list' %}{% endif %}" class="relative hidden sm:block w-64" role="search">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">search</span>
@@ -486,6 +509,27 @@
 <!-- Mobile Navigation Drawer Overlay -->
 <div id="mobileDrawerOverlay" class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm hidden transition-opacity duration-300" onclick="toggleMobileSidebar()"></div>
 
+<script>
+    // Notification polling
+    function updateNotificationBadge() {
+        fetch('{% url "fleet:notification_unread_count" %}')
+            .then(r => r.json())
+            .then(data => {
+                var badge = document.getElementById('notificationBadge');
+                if (data.count > 0) {
+                    badge.textContent = data.count > 99 ? '99+' : data.count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            })
+            .catch(function() {});
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        updateNotificationBadge();
+        setInterval(updateNotificationBadge, 10000);
+    });
+</script>
 <script>
     // Toggle Mobile Sidebar
     function toggleMobileSidebar() {

@@ -196,3 +196,84 @@ class VehicleDocument(models.Model):
         return f"{self.vehicle.registration_number} - {self.document_type}"
 
 
+class AuditLog(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    username = models.CharField(max_length=150)
+    role = models.CharField(max_length=20, blank=True)
+    action = models.CharField(max_length=20, db_index=True)
+    module = models.CharField(max_length=50, db_index=True)
+    object_id = models.CharField(max_length=50, blank=True)
+    object_repr = models.CharField(max_length=200, blank=True)
+    previous_value = models.TextField(blank=True)
+    new_value = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Audit logs'
+
+    def __str__(self):
+        return f"{self.username} {self.action} {self.module} at {self.created_at}"
+
+
+class Notification(models.Model):
+    class Type(models.TextChoices):
+        TRIP = 'trip', 'Trip'
+        MAINTENANCE = 'maintenance', 'Maintenance'
+        FUEL = 'fuel', 'Fuel'
+        EXPENSE = 'expense', 'Expense'
+        DRIVER = 'driver', 'Driver'
+        VEHICLE = 'vehicle', 'Vehicle'
+        SYSTEM = 'system', 'System'
+        LICENSE = 'license', 'License'
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    notification_type = models.CharField(max_length=20, choices=Type.choices, default=Type.SYSTEM, db_index=True)
+    link = models.CharField(max_length=300, blank=True)
+    is_read = models.BooleanField(default=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.get_notification_type_display()}] {self.title}"
+
+
+class VehicleLocation(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='locations')
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    speed = models.DecimalField(max_digits=6, decimal_places=1, default=0, help_text='km/h')
+    heading = models.IntegerField(default=0, help_text='degrees')
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.vehicle.registration_number} @ ({self.latitude}, {self.longitude})"
+
+
+class Checkpoint(models.Model):
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name='checkpoints')
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    is_current_location = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name_plural = 'Checkpoints'
+
+    def __str__(self):
+        return f"{self.name} (Trip #{self.trip_id})"
+
+
