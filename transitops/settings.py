@@ -62,16 +62,8 @@ if DATABASE_URL and HAS_POSTGRES:
     import dj_database_url
     DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
 elif HAS_POSTGRES:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': '0507@Hetpatel',
-            'HOST': 'db.bpmtafoikxboqfjgyqrp.supabase.co',
-            'PORT': '5432',
-        }
-    }
+    import dj_database_url
+    DATABASES = {'default': dj_database_url.config(default=DATABASE_URL or 'postgresql://postgres.bpmtafoikxboqfjgyqrp:0507%40Hetpatel@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres')}
 else:
     DATABASES = {
         'default': {
