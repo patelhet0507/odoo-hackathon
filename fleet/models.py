@@ -16,15 +16,15 @@ class Vehicle(models.Model):
         CAR = 'Car', 'Car'
         BUS = 'Bus', 'Bus'
 
-    registration_number = models.CharField(max_length=50, unique=True)
-    name = models.CharField(max_length=100)
-    model = models.CharField(max_length=100, blank=True)
-    vehicle_type = models.CharField(max_length=20, choices=Type.choices, default=Type.VAN)
+    registration_number = models.CharField(max_length=50, unique=True, db_index=True)
+    name = models.CharField(max_length=100, db_index=True)
+    model = models.CharField(max_length=100, blank=True, db_index=True)
+    vehicle_type = models.CharField(max_length=20, choices=Type.choices, default=Type.VAN, db_index=True)
     max_load_capacity = models.DecimalField(max_digits=10, decimal_places=2, help_text='kg')
     odometer = models.IntegerField(default=0, help_text='km')
     acquisition_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.AVAILABLE)
-    region = models.CharField(max_length=100, blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.AVAILABLE, db_index=True)
+    region = models.CharField(max_length=100, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -71,13 +71,13 @@ class Driver(models.Model):
         D = 'D', 'D - Bus'
         E = 'E', 'E - Heavy Vehicle'
 
-    name = models.CharField(max_length=100)
-    license_number = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=100, db_index=True)
+    license_number = models.CharField(max_length=50, unique=True, db_index=True)
     license_category = models.CharField(max_length=10, choices=LicenseCategory.choices, default=LicenseCategory.B)
     license_expiry_date = models.DateField()
     contact_number = models.CharField(max_length=20)
     safety_score = models.IntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.AVAILABLE)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.AVAILABLE, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -106,7 +106,7 @@ class Trip(models.Model):
     cargo_weight = models.DecimalField(max_digits=10, decimal_places=2, help_text='kg')
     planned_distance = models.DecimalField(max_digits=10, decimal_places=2, help_text='km')
     actual_distance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text='km')
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT, db_index=True)
     dispatched_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     start_odometer = models.IntegerField(null=True, blank=True)

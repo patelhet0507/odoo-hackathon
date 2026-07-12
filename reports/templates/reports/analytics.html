@@ -5,35 +5,32 @@
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
     <div>
         <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight font-bold mb-1">Reports &amp; Analytics</h1>
-        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Perform vehicle ROI analysis, cost breakdown breakdowns, and export log reports.</p>
+        <p class="text-sm text-on-surface-variant dark:text-surface-variant">Comprehensive fleet analytics, cost breakdowns, ROI tracking, and data exports.</p>
     </div>
 </div>
 
-<!-- KPI Cards Grid -->
+<!-- KPI Cards Grid - Row 1 -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <!-- Fleet Utilization -->
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Fleet Utilization</span>
             <h2 class="text-3xl font-bold text-secondary dark:text-secondary-fixed-dim mt-1">{{ fleet_utilization }}%</h2>
+            <p class="text-xs text-on-surface-variant mt-1">{{ active_vehicles }}/{{ total_vehicles }} active</p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary dark:text-secondary-fixed-dim">
+        <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
             <span class="material-symbols-outlined text-[28px]">insights</span>
         </div>
     </div>
-
-    <!-- Fuel Efficiency -->
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Fuel Efficiency</span>
             <h2 class="text-3xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ fuel_efficiency }} <span class="text-sm text-outline font-medium">km/L</span></h2>
+            <p class="text-xs text-on-surface-variant mt-1">{{ total_fuel_liters|floatformat:0 }} L total</p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container dark:text-tertiary-fixed-dim">
+        <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container">
             <span class="material-symbols-outlined text-[28px]">local_gas_station</span>
         </div>
     </div>
-
-    <!-- Operational Cost -->
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Operational Cost</span>
@@ -43,17 +40,56 @@
             <span class="material-symbols-outlined text-[28px]">payments</span>
         </div>
     </div>
-
-    <!-- Completion Rate -->
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
         <div>
             <span class="text-xs font-semibold text-outline tracking-wider uppercase">Completion Rate</span>
-            <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">
-                {% if total_trips %}{{ completed_trips|floatformat:0 }}/{{ total_trips }}{% else %}0/0{% endif %}
-            </h2>
+            <h2 class="text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-1">{{ completion_rate }}%</h2>
+            <p class="text-xs text-on-surface-variant mt-1">{{ completed_trips }}/{{ total_trips }} trips</p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
+        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
             <span class="material-symbols-outlined text-[28px]">check_circle</span>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards Grid - Row 2 -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+        <div>
+            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Total Vehicles</span>
+            <h2 class="text-2xl font-bold text-on-surface dark:text-white mt-1">{{ total_vehicles }}</h2>
+            <p class="text-xs text-on-surface-variant mt-1">{{ available_vehicles }} available, {{ in_shop_vehicles }} in shop</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-surface-container-high/50 flex items-center justify-center text-outline">
+            <span class="material-symbols-outlined text-[28px]">directions_car</span>
+        </div>
+    </div>
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+        <div>
+            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Total Drivers</span>
+            <h2 class="text-2xl font-bold text-on-surface dark:text-white mt-1">{{ total_drivers }}</h2>
+            <p class="text-xs text-on-surface-variant mt-1">Avg safety: {{ avg_safety }}/100</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-surface-container-high/50 flex items-center justify-center text-outline">
+            <span class="material-symbols-outlined text-[28px]">groups</span>
+        </div>
+    </div>
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+        <div>
+            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Avg Trip Distance</span>
+            <h2 class="text-2xl font-bold text-tertiary-container dark:text-tertiary-fixed-dim mt-1">{{ avg_distance }} <span class="text-sm text-outline font-medium">km</span></h2>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-tertiary-container/10 flex items-center justify-center text-tertiary-container">
+            <span class="material-symbols-outlined text-[28px]">map</span>
+        </div>
+    </div>
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex items-center justify-between">
+        <div>
+            <span class="text-xs font-semibold text-outline tracking-wider uppercase">Expired Licenses</span>
+            <h2 class="text-2xl font-bold text-error mt-1">{{ expired_licenses }}</h2>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error">
+            <span class="material-symbols-outlined text-[28px]">badge</span>
         </div>
     </div>
 </div>
@@ -68,10 +104,17 @@
         </div>
     </div>
 
+    <!-- Vehicle Type Distribution -->
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Vehicle Type Distribution</h3>
+        <div class="relative h-[240px] flex items-center justify-center">
+            <canvas id="typeChart"></canvas>
+        </div>
+    </div>
+
     <!-- Vehicle ROI list -->
     <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex flex-col">
-        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Vehicle Return on Investment (ROI)</h3>
-        
+        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Vehicle ROI</h3>
         <div class="overflow-y-auto max-h-[240px] flex-1">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -87,9 +130,9 @@
                     {% for v in vehicle_rois %}
                     <tr class="hover:bg-surface-container-low dark:hover:bg-outline-variant/10 transition-colors">
                         <td class="py-2.5 px-3 font-bold text-on-surface dark:text-white">{{ v.vehicle }}</td>
-                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.acquisition_cost }}</td>
-                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.maintenance_cost }}</td>
-                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.fuel_cost }}</td>
+                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.acquisition_cost|floatformat:0 }}</td>
+                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.maintenance_cost|floatformat:0 }}</td>
+                        <td class="py-2.5 px-3 font-semibold text-outline">₹{{ v.fuel_cost|floatformat:0 }}</td>
                         <td class="py-2.5 px-3 text-right">
                             {% if v.roi >= 0 %}
                                 <span class="px-2 py-0.5 font-bold rounded bg-on-tertiary-container text-tertiary-container">{{ v.roi }}%</span>
@@ -99,12 +142,18 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="5" class="py-6 text-center text-outline">No ROI data calculated.</td>
-                    </tr>
+                    <tr><td colspan="5" class="py-6 text-center text-outline">No ROI data calculated.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Region Distribution -->
+    <div class="bg-surface-container-lowest dark:bg-outline-variant/5 border border-outline-variant/30 rounded-2xl p-5 shadow-sm">
+        <h3 class="text-sm font-semibold text-on-surface dark:text-white uppercase tracking-wider mb-4">Fleet by Region</h3>
+        <div class="relative h-[240px] flex items-center justify-center">
+            <canvas id="regionChart"></canvas>
         </div>
     </div>
 </div>
@@ -135,12 +184,12 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Custom colors mapping
-    const colorPrimary = '#4143d5';       // Fuel (Indigo)
-    const colorError = '#ba1a1a';         // Maintenance (Red)
-    const colorSecondary = '#645efb';     // Other (Purple)
+    const colorPrimary = '#4143d5';
+    const colorError = '#ba1a1a';
+    const colorSecondary = '#645efb';
+    const colorTertiary = '#008259';
+    const colorOutline = '#767586';
 
-    // Cost Chart
     new Chart(document.getElementById('costChart'), {
         type: 'doughnut',
         data: {
@@ -148,22 +197,76 @@ document.addEventListener('DOMContentLoaded', () => {
             datasets: [{
                 data: [{{ fuel_cost }}, {{ maint_cost }}, {{ other_cost }}],
                 backgroundColor: [colorPrimary, colorError, colorSecondary],
-                borderWidth: 0,
-                hoverOffset: 4
+                borderWidth: 0, hoverOffset: 4
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        boxWidth: 12,
-                        padding: 15,
+                    position: 'bottom', labels: {
+                        boxWidth: 12, padding: 15,
                         color: document.documentElement.classList.contains('dark') ? '#eff1f3' : '#191c1e',
                         font: { family: 'Inter', size: 12 }
                     }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('typeChart'), {
+        type: 'doughnut',
+        data: {
+            labels: [{% for t in type_data %}'{{ t.vehicle_type }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for t in type_data %}{{ t.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [colorPrimary, colorSecondary, colorTertiary, colorOutline],
+                borderWidth: 0, hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom', labels: {
+                        boxWidth: 12, padding: 15,
+                        color: document.documentElement.classList.contains('dark') ? '#eff1f3' : '#191c1e',
+                        font: { family: 'Inter', size: 12 }
+                    }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('regionChart'), {
+        type: 'bar',
+        data: {
+            labels: [{% for r in region_data %}'{{ r.region }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Vehicles',
+                data: [{% for r in region_data %}{{ r.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [colorPrimary, colorSecondary, colorTertiary, colorError, colorOutline],
+                borderRadius: 6, borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true, ticks: {
+                        stepSize: 1,
+                        color: document.documentElement.classList.contains('dark') ? '#767586' : '#464555',
+                        font: { family: 'Inter' }
+                    },
+                    grid: { color: 'rgba(118, 117, 134, 0.1)' }
+                },
+                x: {
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#767586' : '#464555',
+                        font: { family: 'Inter' }
+                    },
+                    grid: { display: false }
                 }
             }
         }

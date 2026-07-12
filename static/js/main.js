@@ -14,6 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('theme', next);
         toggle.innerHTML = next === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-fill"></i>';
     });
+
+    // ponytail: debounce search form submission
+    const searchInput = document.querySelector('input[name="q"]');
+    if (searchInput) {
+        let timer;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timer);
+            timer = setTimeout(function() { searchInput.closest('form').submit(); }, 400);
+        });
+    }
 });
 
 
