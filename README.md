@@ -2,6 +2,8 @@
 
 TRANSITOPS is a premium, responsive web application designed for enterprise logistics and fleet operations. It enables logistics managers to monitor vehicle telemetries, dispatch drivers, log maintenance records, track fuel/expenses, analyze fleet utilization, and export operational reports.
 
+**Live Demo**: [https://odoo-hackathon-wheat.vercel.app/](https://odoo-hackathon-wheat.vercel.app/)
+
 ---
 
 ## 🚀 Key Features
@@ -12,45 +14,59 @@ TRANSITOPS is a premium, responsive web application designed for enterprise logi
 * **Operational Dashboard**: Real-time stats (Active Vehicles, In Maintenance, Active Trips, Utilization Rate) alongside dynamic visual charts (vehicle distribution, driver duties, trip timelines) built with Chart.js.
 * **Asset Directory**: Comprehensive management panels to create, read, update, and delete (CRUD) Vehicles, Drivers, Trips, Maintenance tickets, Fuel logs, and Expenses.
 * **Export Utilities**: Quick buttons to export tabular logs (Vehicles, Drivers, Trips, Fuel logs) to CSV format.
-* **Local SQLite Fallback**: Automatic detection and fallback to a local SQLite database if the main PostgreSQL database settings are offline.
+* **Auto DB Fallback**: Automatically uses PostgreSQL when available (via DATABASE_URL env var), falls back to local SQLite for development.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Backend**: Django (Python 3.11+)
+* **Backend**: Django 6.0 (Python 3.12+)
 * **Frontend**: HTML5, Vanilla CSS, Tailwind CSS, Chart.js
-* **Database**: PostgreSQL (Production) / SQLite (Local Dev fallback)
+* **Database**: PostgreSQL (Supabase, via connection pooler) / SQLite (local dev)
+* **Hosting**: Vercel (serverless functions + static files via WhiteNoise)
+* **Storage**: S3-compatible (optional, via django-storages)
+
+---
+
+## 🌐 Production Deployment
+
+The app is deployed on **Vercel** with **Supabase PostgreSQL** using the connection pooler (port 6543) for IPv4 compatibility. Set the following environment variables on Vercel:
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Supabase pooler URL (e.g., `postgresql://postgres.REF:PASS@aws-0-REGION.pooler.supabase.com:6543/postgres`) |
+| `DJANGO_SECRET_KEY` | Django secret key |
+| `DJANGO_DEBUG` | Set to `False` in production |
+
+Migrations run automatically on each deploy via `manage.py migrate` in the build step.
 
 ---
 
 ## 🔧 Local Quick Start Guide
 
-### 1. Prerequisite Packages
-Ensure you have Python installed (Python 3.11+ recommended).
+### 1. Prerequisites
+```bash
+pip install -r requirements.txt
+```
 
 ### 2. Run Database Migrations
-Initialize the local SQLite database schema by running:
 ```bash
 python manage.py migrate
 ```
 
 ### 3. Seed Realistic Mock Data
-Populate the database with test assets (Volvo FH16, Peterbilt 579, Freightliner, Mercedes Sprinter, driver Marcus Johnson, trips, maintenance check logs) and set up the default admin credentials:
+Populate the database with test assets (vehicles, drivers, trips, maintenance logs) and default admin credentials:
 ```bash
 python seed_data.py
 ```
 
-### 4. Boot Development Server
-Run the local server:
+### 4. Start Development Server
 ```bash
 python manage.py runserver
 ```
 
-### 5. Access and Log In
-Open your browser and navigate to `http://127.0.0.1:8000/`.
-
-Log in using the seeded administrator credentials:
+### 5. Login
+Open `http://127.0.0.1:8000/` and log in with:
 * **Username**: `admin`
 * **Password**: `admin123`
 
@@ -58,13 +74,14 @@ Log in using the seeded administrator credentials:
 
 ## 📂 Project Architecture
 
-* `transitops/` - Core Django project settings and URLs routing.
-* `accounts/` - Custom user authentication models, roles, and login views.
-* `dashboard/` - Telemetry views, KPI computations, and dashboard templates.
-* `fleet/` - Business logic models, CRUD views, forms, and templates for Vehicles, Drivers, Trips, Maintenance, Fuel logs, and Expenses.
-* `reports/` - Data metrics processing, Chart.js visualizations, and CSV exporting tools.
-* `templates/` - Global HTML base layouts (`base.html`).
-* `static/` - Static CSS and JS assets.
-* `seed_data.py` - Seeding script to initialize local databases.
+* `transitops/` - Core Django settings and URL routing.
+* `accounts/` - Custom user model (roles: fleet manager, driver, safety officer, financial analyst), auth views.
+* `dashboard/` - KPI computations, telemetry dashboard with Chart.js.
+* `fleet/` - CRUD for Vehicles, Drivers, Trips, Maintenance, Fuel, Expenses.
+* `reports/` - Analytics, CSV export, PDF report generation (xhtml2pdf).
+* `templates/` - Global base layout (`base.html`) with light/dark theme.
+* `static/` - CSS and JS assets.
+* `api/` - Vercel serverless function entry point (`index.py`).
+* `seed_data.py` - Script to populate database with sample data.
 
 
